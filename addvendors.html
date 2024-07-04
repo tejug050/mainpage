@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendors Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .container {
+            width: 70%;
+            margin: 0 auto;
+        }
+
+        .form-container {
+            text-align: center;
+            margin: 20px;
+        }
+
+        .form-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: green;
+            color: white;
+            border: none;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .edit-input {
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search-container input {
+            width: 50%;
+            padding: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Vendors Dashboard</h1>
+    <div class="container">
+        <div class="form-container">
+            <button onclick="addVendorRow()">Add Vendor</button>
+        </div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search for vendors.." onkeyup="searchVendors()">
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>SL No</th>
+                    <th>Name</th>
+                    <th>Company Name</th>
+                    <th>Mobile No</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="vendor-list">
+                <!-- Vendors will be loaded here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function loadVendors() {
+            try {
+                const response = await fetch('http://192.168.0.121:3000/api/vendors');
+                const vendors = await response.json();
+
+                const vendorList = document.getElementById('vendor-list');
+                vendorList.innerHTML = '';
+
+                vendors.forEach((vendor, index) => {
+                    const row = `<tr id="vendor-${vendor.vendor_id}">
+                        <td>${index + 1}</td>
+                        <td>${vendor.vendor_name}</td>
+                        <td>${vendor.company_name}</td>
+                        <td>${vendor.mobile_no}</td>
+                        <td><button onclick="editVendor(this, ${vendor.vendor_id})">Edit</button></td>
+                    </tr>`;
+                    vendorList.innerHTML += row;
+                });
+            } catch (error) {
+                console.error('Error loading vendors:', error.message);
+            }
+        }
+
+        // Add a new vendor row
+        function addVendorRow() {
+            const table = document.getElementById('vendor-list');
+            const rowCount = table.rows.length;
+            const row = table.insertRow(rowCount);
+
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            const cell3 = row.insertCell(2);
+            const cell4 = row.insertCell(3);
+            const cell5 = row.insertCell(4);
+
+            cell1.innerHTML = rowCount + 1;
+            cell2.innerHTML = `<input type="text" class="edit-input" id="newVendorName${rowCount + 1}" placeholder="Vendor Name">`;
+            cell3.innerHTML = `<input type="text" class="edit-input" id="newCompanyName${rowCount + 1}" placeholder="Company Name">`;
+            cell4.innerHTML = `<input type="text" class="edit-input" id="newMobileNo${rowCount + 1}" placeholder="Mobile No">`;
+            cell5.innerHTML = '<button onclick="submitNewVendor(this)">Submit</button>';
+        }
+
+        // Submit new vendor
+        async function submitNewVendor(button) {
+            const row = button.parentNode.parentNode;
+            const newVendorName = document.getElementById(`newVendorName${row.rowIndex}`).value;
+            const newCompanyName = document.getElementById(`newCompanyName${row.rowIndex}`).value;
+            const newMobileNo = document.getElementById(`newMobileNo${row.rowIndex}`).value;
+
+            if (newVendorName && newCompanyName && newMobileNo) {
+                try {
+                    const response = await fetch('http://192.168.0.121:3000/api/vendors', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            vendor_name: newVendorName,
+                            company_name: newCompanyName,
+                            mobile_no: newMobileNo
+                        }),
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const vendorList = document.getElementById('vendor-list');
+                        const newRow = `<tr id="vendor-${data.vendor_id}">
+                            <td>${data.vendor_id}</td>
+                            <td>${newVendorName}</td>
+                            <td>${newCompanyName}</td>
+                            <td>${newMobileNo}</td>
+                            <td><button onclick="editVendor(this, ${data.vendor_id})">Edit</button></td>
+                        </tr>`;
+                        vendorList.insertAdjacentHTML('beforeend', newRow);
+
+                        // Clear input fields after adding
+                        document.getElementById(`newVendorName${row.rowIndex}`).value = '';
+                        document.getElementById(`newCompanyName${row.rowIndex}`).value = '';
+                        document.getElementById(`newMobileNo${row.rowIndex}`).value = '';
+                    } else {
+                        throw new Error('Failed to add vendor');
+                    }
+                } catch (error) {
+                    console.error('Error adding vendor:', error.message);
+                    alert('Failed to add vendor');
+                }
+            } else {
+                alert('Please fill in all fields');
+            }
+        }
+
+        async function editVendor(button, vendorId) {
+            try {
+                const row = button.parentNode.parentNode;
+                const cells = row.getElementsByTagName('td');
+
+                const vendorName = cells[1].innerText;
+                const companyName = cells[2].innerText;
+                const mobileNo = cells[3].innerText;
+
+                cells[1].innerHTML = `<input type="text" class="edit-input" value="${vendorName}" id="editVendorName${vendorId}">`;
+                cells[2].innerHTML = `<input type="text" class="edit-input" value="${companyName}" id="editCompanyName${vendorId}">`;
+                cells[3].innerHTML = `<input type="text" class="edit-input" value="${mobileNo}" id="editMobileNo${vendorId}">`;
+                cells[4].innerHTML = `<button onclick="submitVendorEdit(${vendorId})">Save</button>`;
+            } catch (error) {
+                console.error('Error editing vendor:', error.message);
+                alert('Failed to edit vendor');
+            }
+        }
+
+        async function submitVendorEdit(vendorId) {
+            const vendorName = document.getElementById(`editVendorName${vendorId}`).value;
+            const companyName = document.getElementById(`editCompanyName${vendorId}`).value;
+            const mobileNo = document.getElementById(`editMobileNo${vendorId}`).value;
+
+            try {
+                const response = await fetch(`http://192.168.0.121:3000/api/vendors/${vendorId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        vendor_name: vendorName,
+                        company_name: companyName,
+                        mobile_no: mobileNo
+                    }),
+                });
+
+                if (response.ok) {
+                    const updatedVendor = await response.json();
+                    const row = document.getElementById(`vendor-${vendorId}`);
+                    row.innerHTML = `<td>${vendorId}</td>
+                        <td>${vendorName}</td>
+                        <td>${companyName}</td>
+                        <td>${mobileNo}</td>
+                        <td><button onclick="editVendor(this, ${vendorId})">Edit</button></td>`;
+                } else {
+                    throw new Error('Failed to update vendor');
+                }
+            } catch (error) {
+                console.error('Error updating vendor:', error.message);
+                alert('Failed to update vendor');
+            }
+        }
+
+        function searchVendors() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toUpperCase();
+            const vendorTable = document.getElementById('vendor-list');
+            const tr = vendorTable.getElementsByTagName('tr');
+
+            for (let i = 0; i < tr.length; i++) {
+                const td = tr[i].getElementsByTagName('td')[1]; // Index 1 is for the Name column
+                if (td) {
+                    const txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = '';
+                    } else {
+                        tr[i].style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadVendors();
+        });
+    </script>
+</body>
+</html

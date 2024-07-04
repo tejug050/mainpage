@@ -1,0 +1,376 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <title>Holiday Table</title>
+      <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin: 50px auto;
+            height: 100px;
+            border: 2px solid #000;
+        }
+
+        th, td {
+            padding: 12px 15px; /* Increased padding for better spacing */
+            text-align: center;
+            border: 1px solid #000; /* Changed border color to black */
+        }
+
+        th {
+            background-color: #f2f2f2;
+            color: blue;
+            font-weight: bold; /* Make body text bold */
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 15px;
+            border: 1px solid #888;
+            width: 500px;
+        }
+
+        .close {
+            color: red;
+            float: right;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: darkred;
+            text-decoration: none;
+        }
+.selected-date {
+    background-color: red;
+    color: white; /* Add this to ensure text is readable on red background */
+}
+.add-button {
+    background-color: #4caf50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.delete button {
+  background-color: #ff0000; /* Red background color */
+  color: #ffffff; /* White text color */
+  border: none; /* No border */
+  padding: 5px 10px; /* Padding */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Cursor style */
+}
+
+.delete button:hover {
+  background-color: #cc0000; /* Darker red background color on hover */
+}
+/* Style for the submit button */
+/* Style for the submit button */
+.submit-button,
+.action-buttons button:not(.submit-button) {
+    padding: 10px 20px; /* Equal padding for both buttons */
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-right: 5px; /* Add some margin to separate buttons */
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* Style for the submit button */
+.submit-button {
+    background-color: #4caf50; /* Green */
+    border: none;
+    color: white;
+}
+
+/* Style for the delete button */
+.action-buttons button:not(.submit-button) {
+    background-color: #ff0000; /* Red background color */
+    color: #ffffff; /* White text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Cursor style */
+}
+
+.action-buttons button:not(.submit-button):hover {
+    background-color: #cc0000; /* Darker red background color on hover */
+}
+.hidden-message {
+    display: none;
+    text-align: center;
+    padding: 10px;
+    color: rgb(25, 185, 17);
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.editable-text {
+    color: blue; /* Change the color to your preferred color */
+}
+
+    </style>
+</head>
+<body>
+    <h1>Event Calendar</h1>
+    <button class="add-button" onclick="addRow()">ADD</button><br>
+    <div id="message" class="hidden-message"></div>
+    <table>
+        <thead>
+            <tr>
+                <th class="sl-no">SL.NO</th>
+                <th class="holiday">HOLIDAY</th>
+                <th class="date">DATE</th>
+                <th class="delete">DELETE</th>
+            </tr>
+        </thead>
+        <tbody>
+           
+        </tbody>
+    </table>
+<!-- Modal popup for calendar -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script>
+$(document).ready(function() {
+    // When a date cell is clicked, show the calendar modal
+    $('.date').on('click', function() {
+        $('#myModal').css('display', 'block');
+        var date = new Date($(this).data('date'));
+        generateCalendar(date);
+        // Remove the highlight from all date cells
+        $('.date').removeClass('selected-date');
+        // Highlight the clicked date cell
+        $(this).addClass('selected-date');
+    });
+
+    // Close the modal when the close button or outside the modal is clicked
+    $('.close').on('click', function() {
+        $('#myModal').css('display', 'none');
+    });
+
+    $(window).on('click', function(event) {
+        if (event.target == $('#myModal')[0]) {
+            $('#myModal').css('display', 'none');
+        }
+    });
+});
+
+// Function to generate HTML calendar
+function generateCalendar(selectedDate) {
+    var month = selectedDate.getMonth();
+    var year = selectedDate.getFullYear();
+    var daysInMonth = new Date(year, month + 1, 0).getDate();
+    var firstDay = new Date(year, month, 1).getDay();
+
+    var calendarHTML = '<table><thead><tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr></thead><tbody><tr>';
+
+    // Fill in blank cells for days before the first day of the month
+    for (var i = 0; i < firstDay; i++) {
+        calendarHTML += '<td></td>';
+    }
+
+    // Fill in the days of the month
+    for (var i = 1; i <= daysInMonth; i++) {
+        var dateString = (month + 1) + '-' + i + '-' + year;
+        var cellClass = '';
+        if (selectedDate.getDate() === i) {
+            cellClass = 'selected-date';
+        }
+        calendarHTML += '<td class="' + cellClass + '">' + i + '</td>';
+        if ((i + firstDay) % 7 === 0) {
+            calendarHTML += '</tr><tr>';
+        }
+    }
+
+    calendarHTML += '</tr></tbody></table>';
+
+    $('#calendar').html(calendarHTML);
+}
+
+    </script>
+   
+
+    <script>
+       function addRow() {
+    var table = $('table tbody');
+    var rowCount = table.find('tr').length;
+
+    var newRow = $('<tr>' +
+        '<td class="sl-no">' + (rowCount + 1) + '</td>' +
+        '<td class="holiday" contenteditable="true" onclick="selectText(this)"><span class="editable-text">Click to edit</span></td>' +
+        '<td class="date" contenteditable="true" data-date="" onclick="selectText(this)"><span class="editable-text">Click to edit</span></td>' +
+        '<td class="action-buttons">' + 
+        '<button class="submit-button" onclick="submitTable()">Submit</button>' +
+        '<button onclick="deleteRow(this)">Delete</button>' +
+        '</td>' +
+        '</tr>');
+
+    table.append(newRow);
+
+    // Scroll to the end of the table
+    var lastRow = table.find('tr:last-child');
+    lastRow[0].scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+
+    </script>
+
+    
+    <script>
+        function submitTable() {
+    // Get the holiday data from the table
+    var holidayName = $('table tbody tr:last-child td.holiday').text();
+    var date = $('table tbody tr:last-child td.date').text();
+
+    // Send a POST request to the server
+    $.ajax({
+        url: 'http://192.168.0.121:3000/submit',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ holiday_name: holidayName, date: date }),
+        success: function(response) {
+            // If the request is successful, log the response
+            console.log(response);
+            showMessage("Holiday data inserted successfully");
+            
+            // Scroll up to show the alert message
+            $('html, body').animate({
+                scrollTop: 0
+            }, 'fast');
+        },
+        error: function(xhr, status, error) {
+            // If there's an error, log the error message
+            console.error('Error:', error);
+        }
+    });
+}
+
+        function showMessage(message) {
+    var messageDiv = $('#message');
+    messageDiv.text(message);
+    messageDiv.slideDown();
+
+    // Hide the message after 3 seconds
+    setTimeout(function() {
+        messageDiv.slideUp();
+    }, 3000);
+}
+    </script>
+
+
+    <script>
+        $(document).ready(function() {
+    // Fetch holiday data when the page loads
+    $.ajax({
+        url: 'http://192.168.0.121:3000/holidays', // Modify the URL to match your server endpoint for fetching holidays
+        method: 'GET',
+        success: function(response) {
+            // Populate the table with holiday data
+            populateTable(response);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching holidays:', error);
+        }
+    });
+
+    function populateTable(holidays) {
+    var tableBody = $('table tbody');
+
+    // Iterate through the holiday data and append rows to the end of the table
+    holidays.forEach(function(holiday, index) {
+        var holidayName = holiday.holiday_name || "Holiday Name Not Available"; // Handle undefined holiday name
+        var date = new Date(holiday.date);
+
+        var day = date.getDate();
+        var month = date.toLocaleString('default', { month: 'short' }); // Get short month name
+        var year = date.getFullYear();
+
+        var formattedDate = ('0' + day).slice(-2) + '-' + month + '-' + year; // Format date as desired
+
+        var newRow = $('<tr>' +
+    '<td class="sl-no">' + (tableBody.find('tr').length + 1) + '</td>' +
+    '<td class="holiday">' + holidayName + '</td>' +
+    '<td class="date" data-date="' + holiday.date + '">' + formattedDate + '</td>' +
+    '<td class="delete"><button onclick="deleteRow(this)">Delete</button></td>' + // Adding delete button dynamically
+    '</tr>');
+tableBody.append(newRow);
+
+    });
+}
+});
+
+    </script>
+    <script>
+        function deleteRow(button) {
+    var row = $(button).closest('tr');
+    var holidayName = row.find('.holiday').text();
+    var confirmation = confirm("Are you sure you want to delete the row for " + holidayName + "?");
+    if (confirmation) {
+        row.remove();
+        deleteFromDatabase(holidayName);
+    }
+}
+function deleteFromDatabase(holidayName) {
+    $.ajax({
+        url: 'http://192.168.0.121:3000/delete',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ holiday_name: holidayName }),
+        success: function(response) {
+            console.log(response);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+        }
+    });
+}
+
+    </script>
+
+</body>
+</html>

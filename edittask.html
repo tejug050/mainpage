@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Task</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            margin-top: 20px;
+        }
+        form label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        form input, form select, form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        form button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Task</h1>
+        <form id="editTaskForm">
+            <input type="hidden" id="taskId" name="taskId">
+            <label for="taskName">Task Name</label>
+            <input type="text" id="taskName" name="taskName" required>
+
+            <label for="startDate">Start Date</label>
+            <input type="date" id="startDate" name="startDate" required>
+
+            <label for="dueDate">Due Date</label>
+            <input type="date" id="dueDate" name="dueDate" required>
+
+            <label for="status">Status</label>
+            <select id="status" name="status" required>
+                <option value="Not Started">Not Started</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+            </select>
+
+            <label for="comment">Comment</label>
+            <textarea id="comment" name="comment" rows="4"></textarea>
+
+            <label for="assignedTo">Assigned To</label>
+            <input type="text" id="assignedTo" name="assignedTo" required>
+
+            <button type="submit">Save</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Function to load task details into form for editing
+            function loadTaskDetails(taskId) {
+                fetch(`http://192.168.0.121:3000/tasks/${taskId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(task => {
+                        // Format dates to display in input fields
+                        const startDate = task.start_date.split('T')[0]; // Remove time part
+                        const dueDate = task.due_date.split('T')[0]; // Remove time part
+
+                        // Fill form fields with task details
+                        document.getElementById('taskId').value = task.task_id;
+                        document.getElementById('taskName').value = task.task_name;
+                        document.getElementById('startDate').value = startDate;
+                        document.getElementById('dueDate').value = dueDate;
+                        document.getElementById('status').value = task.status;
+                        document.getElementById('comment').value = task.comment;
+                        document.getElementById('assignedTo').value = task.username;
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+            // Load task details based on task ID from query parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const taskId = urlParams.get('taskId');
+            if (taskId) {
+                loadTaskDetails(taskId);
+            }
+
+            // Handle form submission for updating task
+            $('#editTaskForm').submit(function(event) {
+                event.preventDefault();
+                const formData = {
+                    taskName: $('#taskName').val(),
+                    startDate: $('#startDate').val(),
+                    dueDate: $('#dueDate').val(),
+                    status: $('#status').val(),
+                    comment: $('#comment').val(),
+                    assignedTo: $('#assignedTo').val()
+                };
+
+                const taskId = $('#taskId').val();
+
+                // Send update request
+                fetch(`http://192.168.0.121:3000/tasks/${taskId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    // Redirect back to project workspace after update
+                    window.location.href = 'http://192.168.0.121:3000/project-workspace';
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    </script>
+</body>
+</html>

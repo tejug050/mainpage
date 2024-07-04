@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Office Booking System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="date"], input[type="time"], select {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input[type="submit"] {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #0056b3;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        #message, #successMessage {
+            margin-top: 10px;
+            display: none;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        #message {
+            background-color: #ff8080;
+            color: #fff;
+        }
+        #successMessage {
+            background-color: #00cc00;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Office Booking System</h1>
+        <form id="bookingForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="room">Select Room:</label>
+            <select id="room" name="room" required>
+                <option value="">Select a room</option>
+                <option value="Conference Room">Conference Room</option>
+                <option value="Devices">Devices</option>
+                <!-- Add more rooms here -->
+            </select>
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" required>
+            <label for="time">Time:</label>
+            <input type="time" id="time" name="time" required>
+            <input type="submit" value="Book">
+        </form>
+        <p id="message">This time slot is already booked. Please choose another time.</p>
+        <p id="successMessage">Booking successful!</p>
+    </div>
+
+    <script>
+        document.getElementById('bookingForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Get form values
+            var username = document.getElementById('username').value;
+            var room = document.getElementById('room').value;
+            var date = document.getElementById('date').value;
+            var time = document.getElementById('time').value;
+
+            // Send booking data to server
+            fetch('http://192.168.0.121:3000/bookings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    room: room,
+                    date: date,
+                    time: time
+                }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Booking successful
+                    document.getElementById('message').style.display = 'none';
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('successMessage').textContent = `Booking successful for ${username}!`;
+
+                    // Clear form after successful booking
+                    document.getElementById('bookingForm').reset();
+                } else {
+                    // Show error message
+                    document.getElementById('message').style.display = 'block';
+                    document.getElementById('message').textContent = `This time slot is already booked by ${data.bookedBy}. Please choose another time.`;
+                    document.getElementById('successMessage').style.display = 'none';
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

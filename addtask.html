@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All User Tasks</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+    }
+    .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        text-align: center;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+    table th, table td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+    table th {
+        background-color: #f2f2f2;
+    }
+    .btn {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-right: 10px;
+    }
+    .btn:hover {
+        background-color: #0056b3;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>All User Tasks</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Task ID</th>
+                <th>Task Name</th>
+                <th>Start Date</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Comment</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="taskTableBody">
+            <!-- Task rows will be inserted here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function fetchAllTasks() {
+        fetch('http://192.168.0.121:3000/tasks')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(tasks => {
+            console.log('Tasks received:', tasks); // Log received tasks
+            let taskTableBody = document.getElementById('taskTableBody');
+            taskTableBody.innerHTML = ''; // Clear previous rows
+
+            tasks.forEach(task => {
+                let row = `<tr>
+                                <td>${task.task_id}</td>
+                                <td>${task.task_name}</td>
+                                <td>${formatDate(task.start_date)}</td>
+                                <td>${formatDate(task.due_date)}</td>
+                                <td>${task.status}</td>
+                                <td>${task.comment ? task.comment : ''}</td>
+                                <td>
+                                    <button class="btn" onclick="editTask(${task.task_id})">Edit</button>
+                                    <button class="btn" onclick="deleteTask(${task.task_id})">Delete</button>
+                                </td>
+                            </tr>`;
+                taskTableBody.innerHTML += row; // Insert new rows
+            });
+        })
+        .catch(error => console.error('Error fetching tasks:', error));
+    }
+
+    function formatDate(date) {
+        if (!date) return '';
+        let d = new Date(date);
+        let formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+        return formattedDate;
+    }
+
+    function editTask(taskId) {
+        console.log('Edit Task ID:', taskId);
+        // Implement edit functionality if needed
+    }
+
+    function deleteTask(taskId) {
+        if (confirm(`Are you sure you want to delete task ID ${taskId}?`)) {
+            fetch(`http://192.168.0.121:3000/tasks/${taskId}`, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Task deleted:', data);
+                fetchAllTasks(); // Update the task table after deleting a task
+            })
+            .catch(error => console.error('Error deleting task:', error));
+        } else {
+            console.log('Deletion cancelled by user.');
+        }
+    }
+
+    fetchAllTasks(); // Call fetchAllTasks initially to populate the table
+</script>
+</body>
+</html>

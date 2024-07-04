@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start; /* Align container to the top */
+      height: 100vh;
+      padding-top: 40px; /* Add some top padding */
+    }
+
+    .container {
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 1000px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .table-container {
+      max-height: 400px; /* Set the maximum height for the table container */
+      overflow-y: auto; /* Enable vertical scrolling */
+      margin-top: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      color: #333;
+  font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Task List</h1>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Serial No.</th>
+            <th>Task Name</th>
+            <th>Task ID</th>
+            <th>Start Date</th>
+            <th>Due Date</th>
+            <th>Total Days</th>
+            <th>Status</th>
+            <th>Comment</th>
+            <th>Username</th>
+          </tr>
+        </thead>
+        <tbody id="taskTableBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('http://192.168.0.121:3000/api/tasks') // Ensure this matches your server URL and port
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+          }
+          return response.json();
+        })
+        .then(data => {
+          const tableBody = document.getElementById('taskTableBody');
+          // Sort tasks by task_id in descending order
+          data.sort((a, b) => b.task_id - a.task_id);
+          data.forEach((task, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${index + 1}</td>
+              <td>${task.task_name}</td>
+              <td>${task.task_id}</td>
+              <td>${formatDate(task.start_date)}</td>
+              <td>${formatDate(task.due_date)}</td>
+              <td>${task.total_days}</td>
+              <td>${task.status}</td>
+              <td>${task.comment}</td>
+              <td>${task.username}</td>
+            `;
+            tableBody.appendChild(row);
+          });
+        })
+        .catch(error => console.error('Error fetching tasks:', error));
+    });
+
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,373 @@
+<style>
+/* General Styles */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+ padding: 0;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+.header {
+  background-color: #333;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+  margin-bottom: 5px; /* Reduce margin to create less space between header and content */
+border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* White border for separation */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow for glassy effect */
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px; /* Reduce margin to create less space between navbar and content */
+}
+
+
+.logo img {
+  width: 120px; /* Adjust the width of the logo */
+}
+
+.header h1 {
+   color: white;
+   margin: 5px 0; /* Adjust margin to reduce space between navbar and heading /  font-size: 24px; / Adjust the font size of the header */
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+}
+
+.user-profile img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-left: 10px;
+}
+
+.logout-btn {
+  background-color: #ff0000;
+  color: #fff;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 3px; /* Adjust the border radius */
+  cursor: pointer;
+  font-size: 14px; /* Adjust the font size */
+  margin-left: 10px; /* Add space between the user image and logout button */
+}
+
+.search-bar {
+  /* Add your styles for the search bar */
+}
+
+.sidebar {
+  float: left;
+  width: 200px;
+  height: 100vh; /* Make the sidebar take full viewport height */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding: 20px;
+  background-color: #f0f0f0;
+}
+
+.sidebar h2 {
+  background-color: #333;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+  font-size: 18px; /* Adjust the font size of the sidebar headings */
+  margin-bottom: 10px; /* Adjust margin to create space between headings */
+  cursor: pointer; /* Add cursor pointer to make headings clickable */
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  margin-bottom: 10px;
+}
+
+.sidebar ul li a {
+  display: block;
+  padding: 5px;
+  background-color: #ddd;
+  text-decoration: none;
+  color: #333;
+}
+
+.sidebar ul li a:hover {
+  background-color: #ccc;
+}
+
+/* Footer Styles */
+.footer {
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 20px;
+  clear: both;
+}
+
+/* Large Photo Container */
+.large-photo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
+  display: none;
+  z-index: 9999; /* Ensure it appears above other elements */
+}
+
+.large-photo {
+  max-width: 20%; /* Adjust the maximum width of the large photo */
+  max-height: 20%; /* Adjust the maximum height of the large photo */
+}
+
+.calendar-image {
+  width: 100%;
+  height: auto;
+  display: none;
+}
+
+/* News Content Styles */
+.news-content {
+  padding: 20px;
+  display: none;
+}
+
+.content-wrapper {
+  display: flex;
+}
+
+/* News Content Styles */
+.news-content {
+  padding: 20px;
+  text-align: center; /* Center align the content */
+}
+
+.news-heading {
+  font-size: 30px;
+  color: #333;
+  margin-bottom: 10px; /* Reduce margin between heading and content */
+  margin-top: 10px; /* Add margin to move the heading higher */
+}
+
+.content-wrapper {
+  display: flex;
+  align-items: flex-start; /* Align items to the starting line */
+  justify-content: center;
+}
+
+.news-image {
+  width: 40%; /* Adjust the width of the image */
+  height: auto; /* Maintain aspect ratio */
+}
+
+.text-wrapper {
+  width: 50%; /* Half of the page width */
+  padding-left: 20px; /* Add some spacing */
+}
+
+.news-content p {
+  text-align: justify;
+  margin: 0; /* Remove margin from the paragraph */
+  font-size: 24px;
+}
+
+
+/* Gallery Styles */
+.gallery-container {
+  display: none; /* Initially hidden */
+  padding: 20px;
+
+}
+
+.gallery-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Center align items vertically */
+  margin-bottom: 10px;
+}
+
+.gallery-image {
+  flex: 1; /* Let the image grow to fill the available space */
+  height: 100px; /* Set a fixed height */
+  width: 100px;
+  object-fit: cover; /* Maintain aspect ratio */
+  cursor: pointer; /* Add pointer cursor for clickable effect */
+  margin: 0 10px; /* Add some margin to each image for spacing */
+}
+
+
+.large-photo-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.large-photo {
+  max-width: 80%;
+  max-height: 80%;
+}
+.gallery-heading {
+  font-size: 30px;
+  color: #333; /* Remove !important to allow center alignment to take effect */
+  margin-bottom: 10px;
+  margin-top: 0px;
+  text-align: center; /* Align gallery heading to the center */
+}
+
+    /* CSS */
+.large-photo-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.large-photo {
+  max-width: 60%;
+  max-height: 60%;
+}
+
+#prevBtn, #nextBtn {
+  position: absolute;
+  top: 50%;
+  color: #f0f0f0;
+  transform: translateY(-50%);
+  background: rgba(25, 12, 202, 0.927); /* Semi-transparent white background */
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+#prevBtn {
+  left: 250px;
+}
+
+#nextBtn {
+  right: 250px;
+}
+#closeBtn {
+  position: absolute;
+  top: 55px;
+  right: 10px;
+  font-size: 30px;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+  z-index: 9999;
+}
+
+</style>
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+           
+            padding: 20px;
+            border-radius: 5px;
+           
+        }
+        h1, h2 {
+            text-align: center;
+            color: #4285f4; /* Blue shining color */
+        }
+        h2 {
+            margin-top: 30px;
+        }
+        p {
+            margin-bottom: 20px;
+             text-align: center;
+        }
+        ul {
+            padding: 0;
+            margin-left: 20px; /* Indentation for list items */
+            
+        }
+        li {
+            margin-bottom: 10px;
+            list-style-type: decimal; /* Change to decimal numbering */
+
+        }
+        .customer-image {
+            max-width: 30%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+        /* Notification Bar Styles */
+
+.notification-icon .fa {
+    font-size: 24px; /* Adjust icon size as needed */
+    color: #333; /* Bell icon color */
+}
+.notification-icon {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-left: auto; /* Aligns the notification icon to the right */
+}
+
+.notification-badge {
+  background-color: red;
+  color: white;
+  font-size: 12px;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: none; /* Initially hide the badge */
+  justify-content: center;
+  align-items: center;
+  margin-left: 5px;
+}
+
+/* Change color of notification bar */
+.notification-icon.active {
+    background-color: white; /* White background color */
+    border: 1px solid #ccc; /* Add border for better visibility */
+}
+.details-table {
+    width: 100%;
+}
+
+.details-table td {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+}
+
+.details-table td:first-child {
+    font-weight: bold;
+    width: 100px;
+}
+
+ </style>
+   

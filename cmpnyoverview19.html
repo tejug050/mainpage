@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Omnitech Solutions</title>
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        h1, h2 {
+            text-align: center;
+            color: #4285f4; /* Blue shining color */
+        }
+        h2 {
+            margin-top: 30px;
+        }
+        p {
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+        }
+        ul {
+            padding: 0;
+            margin-left: 20px; /* Indentation for list items */
+            text-align: left; /* Align text left */
+            list-style-position: inside; /* Position bullets inside */
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+        }
+        li {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .customer-image {
+            max-width: 30%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+        #viewMoreBtn {
+            display: block;
+            margin: 20px auto;
+            background-color: #ffa500; /* Yellow-Orange */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            outline: none;
+        }
+        #swiperModal {
+            display: none;
+            width: 100%;
+        }
+        .swiper-button-next, .swiper-button-prev {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Omnitech Solutions</h1>
+        <!-- Only showing half of the information initially -->
+        <p>Omnitech Solutions is a leading solution provider company that specializes in providing solutions for private data centers, security surveillance systems, and video streaming systems. Headquartered in Silicon Valley, with offices in Canada and India, Omnitech Solutions is a leader in innovative data center solutions for large pet hospitals, chemical plants, security systems for places of worship, hotels, stadiums, and universities. Omnitech Solutions prides itself on customizing solutions to meet the unique requirements of each business it serves.</p>
+        
+        <!-- "View More" button to reveal more details -->
+        <button id="viewMoreBtn">View More Details</button>
+
+        <!-- Swiper modal -->
+        <div class="swiper-container" id="swiperModal">
+            <div class="swiper-wrapper">
+                <!-- Additional details section -->
+                <div class="swiper-slide">
+                    <h2>Our Exclusivity</h2>
+                    <ul>
+                        <li>Custom design and installation of secure private data centers.</li>
+                        <li>Custom design, integration, and installation of security and access control systems.</li>
+                        <li>Custom design hardware and software for video streaming and security systems.</li>
+                        <li>Maintenance and management services for security and access control systems.</li>
+                    </ul>
+                </div>
+                <div class="swiper-slide">
+                    <h2>Our Prime Focus</h2>
+                    <ul>
+                        <li>Large enterprise companies (Banfield, BASF, Chevron).</li>
+                        <li>Historic and industrial buildings.</li>
+                        <li>Places of worship</li>
+                    </ul>
+                </div>
+                <div class="swiper-slide">
+                    <h2>Our Process</h2>
+                    <ul>
+                        <li>Site survey with the customer.</li>
+                        <li>Project planning with the customer.</li>
+                        <li>System installation and commissioning.</li>
+                        <li>Training customer services provided.</li>
+                    </ul>
+                </div>
+                <div class="swiper-slide">
+                    <h2>Our Expertise</h2>
+                    <ul>
+                        <li>Custom design and installation of systems at large enterprise companies (Banfield, BASF, Chevron).</li>
+                        <li>Custom design and installation of systems in historic buildings.</li>
+                        <li>Custom design and installation of systems in places of worship.</li>
+                    </ul>
+                </div>
+                <div class="swiper-slide">
+                    <h2>Services</h2>
+                    <ul>
+                        <li>Custom design and installation of secure private data centers.</li>
+                        <li>Custom design, integration, and installation of security and access control systems.</li>
+                        <li>Custom design hardware and software for video streaming and security systems.</li>
+                        <!-- Add more services here -->
+                    </ul>
+                </div>
+                <div class="swiper-slide">
+                    <h2>Products</h2>
+                    <ul>
+                        <li>OMNI-LIGHT-100: Highly programmable and customizable light controlling product.</li>
+                        <li>Emergency Alert System.</li>
+                        <ul>
+                            <li>Control Box.</li>
+                            <li>Station Box.</li>
+                            <li>Manager’s App.</li>
+                        </ul>
+                    </ul>
+                </div>
+                <div class="swiper-slide">
+                    <h2>Customers</h2>
+                    <ul>
+                        <p>Forge powerful bonds with industry giants like F5, representing high bandwidth, Nginx webservers, and top-tier VPN services; Aerwave, pioneering Wi-Fi secured VPN with remarkable ease; and Kugit, leading the charge in firewall supremacy and VPN innovation. Our journey to excellence is fueled by partnerships that redefine industry standards.<p>
+                        <img class="customer-image" src="f5.png" alt="Partner 1">
+                        <img class="customer-image" src="aerwave.jpg" alt="Partner 2">
+                    </ul>
+                </div>
+            </div>
+            <!-- Add Navigation -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+
+    <!-- Swiper JS -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script>
+        var swiper = new Swiper('#swiperModal', {
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+        });
+
+        document.getElementById('viewMoreBtn').addEventListener('click', function() {
+            document.getElementById('swiperModal').style.display = 'block';
+            swiper.slideNext();
+        });
+    </script>
+</body>
+</html>

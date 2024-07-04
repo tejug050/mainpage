@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internal Message System</title>
+    <!-- Include Quill stylesheet -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <!-- Include Quill library -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <style>
+        /* Reset styles */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Global styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            
+        }
+
+.container {
+    max-width: 700px;
+    max-height: 500px; /* Adjusted to a smaller height */
+    margin: 50px auto;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Ensure the container expands with the content */
+}
+        /* Header styles */
+        header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #ccc;
+        }
+
+        header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        /* Navigation styles */
+        nav {
+            float: left;
+            width: 200px;
+            background-color: #f9f9f9;
+            height: calc(100vh - 130px); /* Adjust based on header and footer heights */
+            overflow-y: auto; /* Enable scrolling if content exceeds height */
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        nav li {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        nav li a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+            padding: 5px;
+        }
+
+        nav li a img {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+        }
+
+        nav li a:hover {
+            background-color: #ddd;
+        }
+
+        /* Content styles */
+        .content {
+            padding: 20px;
+            overflow: auto; /* Enable scrolling if content exceeds height */
+        }
+
+        /* Display the content in the middle */
+        .center {
+            margin: 0 auto;
+            max-width: 600px; /* Adjust as needed */
+        }
+
+        /* Hide elements initially */
+        .hidden {
+            display: none;
+        }
+
+        /* Hide h2 elements */
+        section h2 {
+            display: none;
+        }
+
+
+
+/* Sent Items Section styles */
+#sentItemsContent {
+    padding: 20px;
+    max-height: 400px; /* Adjust as needed */
+    overflow-y: auto; /* Add vertical scroll bar */
+}
+
+.message {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+}
+
+.message p {
+    margin-bottom: 5px;
+}
+
+.message hr {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: 0;
+    border-top: 1px solid #ccc;
+}
+button[type="submit"] {
+    background-color: #f00;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    animation: blink 1s infinite; /* Add animation */
+}
+
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Internal Message System</h1>
+    </header>
+    <nav>
+        <ul>
+           <li><a href="#compose" id="composeLink" style="color: black; font-weight: bold; text-decoration: underline;"><img src="compose.png" alt="Compose"> Compose</a></li>
+        </ul>
+    </nav>
+    <div class="content center">
+               
+    <section id="compose" class="hidden">
+    <h2>Compose</h2>
+    <form id="composeForm" style="width: 100%; max-width: 400px;"> 
+        <label for="senderEmail" style="margin-bottom: 10px;">Sender Email:</label>
+<input type="email" id="senderEmail" name="senderEmail" placeholder="Enter sender email" required style="width: 100%; padding: 8px; margin-bottom: 10px;"><br>
+<label for="receiverEmail" style="margin-bottom: 10px;">Receiver Email:</label>
+<input type="email" id="receiverEmail" name="receiverEmail" placeholder="Enter receiver email" required style="width: 100%; padding: 8px; margin-bottom: 10px;"><br>
+
+        <label for="messageContent" style="margin-bottom: 10px;">Message:</label>
+        <div id="editor" style="width: 100%; border: 1px solid #ccc; border-radius: 4px;"></div><br>
+        <button type="submit" style="background-color: #f00; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; transition: background-color 0.3s ease;">Send</button>
+    </form>
+</section>
+
+
+       
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const links = document.querySelectorAll('nav a');
+    const sections = document.querySelectorAll('section');
+    const quill = new Quill('#editor', {
+        theme: 'snow'
+    });
+
+    // Function to toggle visibility of sections
+    function toggleSectionVisibility(targetId) {
+        sections.forEach(section => {
+            section.classList.add('hidden');
+        });
+        document.getElementById(targetId).classList.remove('hidden');
+    }
+// Update the event listener for the "Sent Items" link
+links.forEach(link => {
+    link.addEventListener('click', async (event) => {
+        event.preventDefault();
+        const targetId = link.getAttribute('href').substring(1);
+        toggleSectionVisibility(targetId);
+
+        if (targetId === 'sent') {
+            try {
+                // Dynamically retrieve the sender email address
+                const senderEmail = document.getElementById('senderEmail').value.trim(); // Trim whitespace from the value
+                if (!senderEmail) {
+                    console.error('Sender email is empty');
+                    displayPopupMessage('Please enter a sender email.');
+                    return;
+                }
+                
+                const response = await fetch(`http://192.168.0.121:3000/sent-messages?senderEmail=${senderEmail}`);
+                if (response.ok) {
+                    const sentMessages = await response.json();
+                    displaySentMessages(sentMessages);
+                } else {
+                    console.error('Failed to fetch sent messages');
+                    displayPopupMessage('Failed to fetch sent messages. Please try again later.');
+                }
+            } catch (error) {
+                console.error('Error fetching sent messages:', error);
+                displayPopupMessage('An error occurred while fetching sent messages. Please try again later.');
+            }
+        }
+        // Add conditions for other sections if needed
+    });
+});
+
+function displaySentMessages(sentMessages) {
+    const sentItemsContent = document.getElementById('sentItemsContent');
+    sentItemsContent.innerHTML = ''; // Clear previous content
+
+    sentMessages.forEach(message => {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message');
+
+        // Format sent date and time consistently
+        const sentDate = new Date(message.sent_at).toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+
+        messageDiv.innerHTML = `
+            <p><strong>Sender:</strong> ${message.sender_email}</p>
+            <p><strong>Receiver:</strong> ${message.receiver_email}</p>
+            <p><strong>Date:</strong> ${sentDate}</p> <!-- Display sent date and time -->
+            <p><strong>Content:</strong> ${message.content}</p>
+            <hr>
+        `;
+        sentItemsContent.appendChild(messageDiv);
+    });
+}
+
+    // Function to display pop-up message
+    function displayPopupMessage(message) {
+        alert(message);
+    }
+
+    document.getElementById('composeForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const senderEmail = document.getElementById('senderEmail').value;
+        const receiverEmail = document.getElementById('receiverEmail').value;
+        const messageContent = quill.root.innerHTML;
+
+        try {
+            const response = await fetch('http://192.168.0.121:3000/post-message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ senderEmail, receiverEmail, messageContent })
+            });
+
+            if (response.ok) {
+                displayPopupMessage('Message sent successfully!');
+                // Clear form fields
+                document.getElementById('senderEmail').value = '';
+                document.getElementById('receiverEmail').value = '';
+                quill.root.innerHTML = '';
+            } else {
+                console.error('Failed to send message');
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+        }
+    });
+});
+</script>
+
+</body>
+</html>

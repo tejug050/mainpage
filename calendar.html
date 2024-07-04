@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <title>Holiday Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin: 50px auto;
+            height: 100px;
+            border: 2px solid #000;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border: 1px solid #000;
+        }
+        th {
+            background-color: #f2f2f2;
+            color: blue;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 15px;
+            border: 1px solid #888;
+            width: 500px;
+        }
+        .close {
+            color: red;
+            float: right;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: darkred;
+            text-decoration: none;
+        }
+        .selected-date {
+            background-color: red;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Event Calendar</h1>
+    <table>
+        <thead>
+            <tr>
+                <th class="sl-no">SL.NO</th>
+                <th class="holiday">HOLIDAY</th>
+                <th class="date">DATE</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <!--<script>
+        $(document).ready(function() {
+            // Fetch holiday data from the server
+            $.get('http://192.168.0.121:3000/holidays', function(data) {
+                // Initialize SL.NO counter
+                var slNo = 1;
+
+                // Populate holiday table dynamically
+                data.forEach(function(holiday) {
+                    var date = formatDate(holiday.date); // Format date
+                    var row = '<tr>' +
+                        '<td class="sl-no">' + slNo++ + '</td>' + // Display SL.NO in sequence
+                        '<td class="holiday">' + holiday.holiday_name + '</td>' +
+                        '<td class="date" data-date="' + holiday.date + '">' + date + '</td>' +
+                        '</tr>';
+                    $('table tbody').append(row);
+                });
+            });
+
+            // Delegate click event to dynamically added date cells
+            $(document).on('click', '.date', function() {
+                $('#myModal').css('display', 'block');
+                var date = new Date($(this).data('date'));
+                generateCalendar(date);
+                // Remove the highlight from all date cells
+                $('.date').removeClass('selected-date');
+                // Highlight the clicked date cell
+                $(this).addClass('selected-date');
+            });
+
+            // Close the modal when the close button or outside the modal is clicked
+            $('.close').on('click', function() {
+                $('#myModal').css('display', 'none');
+            });
+
+            $(window).on('click', function(event) {
+                if (event.target == $('#myModal')[0]) {
+                    $('#myModal').css('display', 'none');
+                }
+            });
+        });
+
+        // Function to generate HTML calendar
+        function generateCalendar(selectedDate) {
+            var month = selectedDate.getMonth();
+            var year = selectedDate.getFullYear();
+            var daysInMonth = new Date(year, month + 1, 0).getDate();
+            var firstDay = new Date(year, month, 1).getDay();
+
+            var calendarHTML = '<table><thead><tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr></thead><tbody><tr>';
+
+            // Fill in blank cells for days before the first day of the month
+            for (var i = 0; i < firstDay; i++) {
+                calendarHTML += '<td></td>';
+            }
+
+            // Fill in the days of the month
+            for (var i = 1; i <= daysInMonth; i++) {
+                var dateString = (month + 1) + '-' + i + '-' + year;
+                var cellClass = '';
+                if (selectedDate.getDate() === i) {
+                    cellClass = 'selected-date';
+                }
+                calendarHTML += '<td class="' + cellClass + '">' + i + '</td>';
+                if ((i + firstDay) % 7 === 0) {
+                    calendarHTML += '</tr><tr>';
+                }
+            }
+
+            calendarHTML += '</tr></tbody></table>';
+
+            $('#calendar').html(calendarHTML);
+        }
+
+        // Function to format date as "DD-Mon-YYYY"
+        function formatDate(dateString) {
+            var date = new Date(dateString);
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            var formattedDate = date.getDate() + '-' + months[date.getMonth()] + '-' + date.getFullYear();
+            return formattedDate;
+        }
+    </script>-->
+    <script>
+        $(document).ready(function() {
+    // Fetch holiday data from the server
+    $.get('http://192.168.0.121:3000/holidays', function(data) {
+        // Sort holidays by month and date
+        data.sort(function(a, b) {
+            var dateA = new Date(a.date);
+            var dateB = new Date(b.date);
+
+            // Compare months first
+            var monthA = dateA.getMonth();
+            var monthB = dateB.getMonth();
+            if (monthA < monthB) return -1;
+            if (monthA > monthB) return 1;
+
+            // If months are the same, compare dates
+            var dayA = dateA.getDate();
+            var dayB = dateB.getDate();
+            return dayA - dayB;
+        });
+
+        // Initialize SL.NO counter
+        var slNo = 1;
+
+        // Populate holiday table dynamically
+        data.forEach(function(holiday) {
+            var date = formatDate(holiday.date); // Format date
+            var row = '<tr>' +
+                '<td class="sl-no">' + slNo++ + '</td>' + // Display SL.NO in sequence
+                '<td class="holiday">' + holiday.holiday_name + '</td>' +
+                '<td class="date" data-date="' + holiday.date + '">' + date + '</td>' +
+                '</tr>';
+            $('table tbody').append(row);
+        });
+    });
+
+    // Delegate click event to dynamically added date cells
+    $(document).on('click', '.date', function() {
+        $('#myModal').css('display', 'block');
+        var date = new Date($(this).data('date'));
+        generateCalendar(date);
+        // Remove the highlight from all date cells
+        $('.date').removeClass('selected-date');
+        // Highlight the clicked date cell
+        $(this).addClass('selected-date');
+    });
+
+    // Close the modal when the close button or outside the modal is clicked
+    $('.close').on('click', function() {
+        $('#myModal').css('display', 'none');
+    });
+
+    $(window).on('click', function(event) {
+        if (event.target == $('#myModal')[0]) {
+            $('#myModal').css('display', 'none');
+        }
+    });
+});
+
+// Function to generate HTML calendar
+function generateCalendar(selectedDate) {
+    var month = selectedDate.getMonth();
+    var year = selectedDate.getFullYear();
+    var daysInMonth = new Date(year, month + 1, 0).getDate();
+    var firstDay = new Date(year, month, 1).getDay();
+
+    var calendarHTML = '<table><thead><tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr></thead><tbody><tr>';
+
+    // Fill in blank cells for days before the first day of the month
+    for (var i = 0; i < firstDay; i++) {
+        calendarHTML += '<td></td>';
+    }
+
+    // Fill in the days of the month
+    for (var i = 1; i <= daysInMonth; i++) {
+        var dateString = (month + 1) + '-' + i + '-' + year;
+        var cellClass = '';
+        if (selectedDate.getDate() === i) {
+            cellClass = 'selected-date';
+        }
+        calendarHTML += '<td class="' + cellClass + '">' + i + '</td>';
+        if ((i + firstDay) % 7 === 0) {
+            calendarHTML += '</tr><tr>';
+        }
+    }
+
+    calendarHTML += '</tr></tbody></table>';
+
+    $('#calendar').html(calendarHTML);
+}
+
+// Function to format date as "DD-Mon-YYYY"
+function formatDate(dateString) {
+    var date = new Date(dateString);
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var formattedDate = date.getDate() + '-' + months[date.getMonth()] + '-' + date.getFullYear();
+    return formattedDate;
+}
+
+    </script>
+</body>
+</html>

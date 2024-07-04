@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendors Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .background-container {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            width: 80%;
+            max-width: 1200px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            cursor: pointer;
+        }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search-container input {
+            width: 50%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-container">
+        <h1>Vendors Dashboard</h1>
+        <div class="container">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search for vendors..." onkeyup="searchVendors()">
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>SL No</th>
+                        <th onclick="sortByName()">Name &#x25B2;&#x25BC;</th>
+                        <th>Company Name</th>
+                        <th>Mobile No</th>
+                    </tr>
+                </thead>
+                <tbody id="vendor-list">
+                    <!-- Vendors will be loaded here dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let vendorsData = []; // To store vendors data globally
+
+        async function loadVendors() {
+            try {
+                const response = await fetch('http://192.168.0.121:3000/api/vendors');
+                const vendors = await response.json();
+
+                // Sort vendors alphabetically by name
+                vendors.sort((a, b) => a.vendor_name.localeCompare(b.vendor_name));
+
+                vendorsData = vendors; // Store vendors data globally
+
+                displayVendors(vendors);
+            } catch (error) {
+                console.error('Error loading vendors:', error.message);
+            }
+        }
+
+        function displayVendors(vendors) {
+            const vendorList = document.getElementById('vendor-list');
+            vendorList.innerHTML = '';
+
+            vendors.forEach((vendor, index) => {
+                const row = `<tr>
+                    <td>${index + 1}</td>
+                    <td>${vendor.vendor_name}</td>
+                    <td>${vendor.company_name}</td>
+                    <td>${vendor.mobile_no}</td>
+                </tr>`;
+                vendorList.innerHTML += row;
+            });
+        }
+
+        // Search vendors
+        function searchVendors() {
+            const input = document.getElementById('searchInput').value.toUpperCase();
+            const table = document.getElementById('vendor-list');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const tdName = rows[i].getElementsByTagName('td')[1];
+                const tdCompany = rows[i].getElementsByTagName('td')[2];
+                const tdMobile = rows[i].getElementsByTagName('td')[3];
+
+                if (tdName || tdCompany || tdMobile) {
+                    const txtValueName = tdName.textContent || tdName.innerText;
+                    const txtValueCompany = tdCompany.textContent || tdCompany.innerText;
+                    const txtValueMobile = tdMobile.textContent || tdMobile.innerText;
+
+                    if (txtValueName.toUpperCase().indexOf(input) > -1 ||
+                        txtValueCompany.toUpperCase().indexOf(input) > -1 ||
+                        txtValueMobile.toUpperCase().indexOf(input) > -1) {
+                        rows[i].style.display = '';
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        // Sort vendors by name alphabetically
+        function sortByName() {
+            vendorsData.reverse(); // Reverse the array to toggle between ascending and descending order
+
+            displayVendors(vendorsData);
+        }
+
+        // Load vendors on page load
+        loadVendors();
+    </script>
+</body>
+</html>

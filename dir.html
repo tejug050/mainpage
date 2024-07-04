@@ -1,0 +1,309 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Management Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #search {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .categories {
+            margin-bottom: 20px;
+        }
+
+        .categories h2 {
+            margin-top: 0;
+        }
+
+        .categories ul {
+            list-style-type: none;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        .categories ul li {
+            margin-bottom: 5px;
+        }
+
+        .upload {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .upload input[type="file"] {
+            margin-bottom: 10px;
+        }
+
+        .upload button {
+            padding: 10px 20px;
+            background-color: #0056b3;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .upload button:hover {
+            background-color: #0056b3;
+        }
+
+        .upload select {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        ul {
+            margin-left: 20px;
+        }
+
+        ul li {
+            list-style-type: disc; /* Ensures bullets */
+            color: black; /* Ensures black color */
+        }
+
+        ul li h3 {
+            list-style-type: none; /* Removes bullets for h3 */
+        }
+
+        ul li a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .highlight {
+            background-color: yellow; /* or any other desired highlight style */
+        }
+
+        #document-viewer {
+            width: 100%;
+            height: 600px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <input type="text" id="search" placeholder="Type here to search for documents" onkeyup="searchDocuments()">
+        </header>
+        <section class="upload">
+            <h2>Upload Document</h2>
+            <input type="file" id="file-upload" multiple>
+            <select id="category-select">
+                <option value="qa-documents">QA Documentation</option>
+                <option value="gatespeed-documents">GateSpeed Documents</option>
+                <option value="git-documents">GIT Documents</option>
+                <option value="webapi-documents">WebAPI Testing Docs</option>
+                <option value="governor-iso-documents">Governor and ISO Build Documents</option>
+            </select>
+            <button id="upload-button" onclick="uploadDocument()">Upload</button>
+        </section>
+        <section class="categories">
+            <h2>Document Categories</h2>
+            <ul>
+                <li>
+                    <h3 onclick="toggleCategory('qa-documents')">QA Documentation</h3>
+                    <ul id="qa-documents" class="document-list">
+                        <!-- Dynamically populated list of QA documents -->
+                    </ul>
+                </li>
+                <li>
+                    <h3 onclick="toggleCategory('gatespeed-documents')">GateSpeed Documents</h3>
+                    <ul id="gatespeed-documents" class="document-list">
+                        <!-- Dynamically populated list of GateSpeed documents -->
+                    </ul>
+                </li>
+                <li>
+                    <h3 onclick="toggleCategory('git-documents')">GIT Documents</h3>
+                    <ul id="git-documents" class="document-list">
+                        <!-- Dynamically populated list of Git documents -->
+                    </ul>
+                </li>
+                <li>
+                    <h3 onclick="toggleCategory('webapi-documents')">WebAPI Testing Docs</h3>
+                    <ul id="webapi-documents" class="document-list">
+                        <!-- Dynamically populated list of WebAPI documents -->
+                    </ul>
+                </li>
+                <li>
+                    <h3 onclick="toggleCategory('governor-iso-documents')">Governor and ISO Build Documents </h3>
+                    <ul id="governor-iso-documents" class="document-list">
+                        <!-- Dynamically populated list of Governor and ISO Build documents -->
+                    </ul>
+                </li>
+            </ul>
+        </section>
+        <iframe id="document-viewer"></iframe>
+    </div>
+<script>
+        function uploadDocument() {
+            if (confirm("Are you sure you want to upload this document?")) {
+                var fileInput = document.getElementById('file-upload');
+                var categorySelect = document.getElementById('category-select');
+                var category = categorySelect.value;
+                var formData = new FormData();
+
+                // Append file and category information to FormData object
+                for (var i = 0; i < fileInput.files.length; i++) {
+                    var file = fileInput.files[i];
+                    var newFileName = category + '_' + file.name; // Append category to file name
+                    formData.append('files', file, newFileName); // Use the new file name
+                }
+                formData.append('category', category); // Append category information
+
+                // Send AJAX request to server
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'http://192.168.0.121:3000/upload', true);
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        alert('Document uploaded successfully');
+                        console.log('Files uploaded successfully');
+                        // Optionally, do something after successful upload
+                    } else {
+                        alert('Error uploading files: ' + xhr.responseText);
+                        console.error('Error uploading files:', xhr.responseText);
+                        // Optionally, handle error
+                    }
+                };
+                xhr.send(formData);
+            }
+        }
+
+        function searchDocuments() {
+            var input = document.getElementById('search').value.toLowerCase();
+            var categories = document.querySelectorAll('.categories ul li');
+
+            // Check if there's a search query
+            var hasSearchQuery = input.trim() !== '';
+
+            categories.forEach(function(category) {
+                var categoryTitle = category.querySelector('h3');
+                var categoryList = category.querySelector('ul');
+
+                var categoryMatch = categoryTitle.textContent.toLowerCase().includes(input);
+
+                if (hasSearchQuery) {
+                    // Highlight categories if there's a search query
+                    categoryTitle.classList.toggle('highlight', categoryMatch);
+                    categoryList.style.display = categoryMatch ? 'block' : 'none';
+                } else {
+                    // Reset styles if there's no search query
+                    categoryTitle.classList.remove('highlight');
+                    categoryList.style.display = 'block';
+                }
+
+                var documents = categoryList.querySelectorAll('li');
+
+                documents.forEach(function(doc) {
+                    var docLink = doc.querySelector('a');
+
+                    var docMatch = docLink.textContent.toLowerCase().includes(input);
+
+                    // Highlight documents if there's a search query
+                    docLink.classList.toggle('highlight', hasSearchQuery && docMatch);
+                    doc.style.display = hasSearchQuery && docMatch ? '' : 'none';
+                });
+            });
+        }
+
+        document.getElementById('search').addEventListener('input', searchDocuments);
+
+        function toggleCategory(category) {
+            var allLists = document.querySelectorAll('.document-list');
+            allLists.forEach(function(list) {
+                if (list.id !== category) {
+                    list.style.display = 'none';
+                }
+            });
+
+            var ul = document.getElementById(category);
+            if (ul.style.display === 'none' || ul.style.display === '') {
+                ul.style.display = 'block';
+                fetchDocuments(category);
+            } else {
+                ul.style.display = 'none';
+            }
+        }
+
+       function openDocument(documentUrl) {
+            var iframe = document.getElementById('document-viewer');
+            iframe.src = documentUrl;
+            iframe.style.display = 'block'; // Show the iframe
+
+            // Scroll to top of iframe content after loading
+            iframe.onload = function() {
+                var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                iframe.contentWindow.scrollTo(0, 0); // Scroll to top of iframe content
+                iframe.scrollIntoView(); // Scroll the iframe into view
+            };
+        }
+
+    // Function to fetch documents for a category
+    function fetchDocuments(category) {
+        var ul = document.getElementById(category);
+        ul.innerHTML = ''; // Clear existing content
+        fetch(`http://192.168.0.121:3000/documents?category=${category}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length === 0) {
+                    ul.innerHTML = '<li>No document uploaded</li>';
+                } else {
+                    data.forEach(doc => {
+                        var li = document.createElement('li');
+                        var a = document.createElement('a');
+                        a.href = `/upload/${doc}`;
+                        a.textContent = doc;
+                        a.onclick = function() {
+                            openDocument(`/upload/${doc}`);
+                            return false; // Prevent default link behavior
+                        };
+                        li.appendChild(a);
+                        ul.appendChild(li);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching documents:', error);
+            });
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Support Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        
+        form {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        select,
+        textarea,
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background-color: #0056b3;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        #otherDetails {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>IT Support Portal</h1>
+        <form id="requestForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="Enter name..." required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" placeholder="Enter email..." required>
+            <label for="requestType">Request Type:</label>
+            <select id="requestType" required onchange="showOtherDetails()">
+                <option value="">Select</option>
+                <option value="Hardware">Hardware Issue</option>
+                <option value="Software">Software Issue</option>
+                <option value="Access">Server Access Request</option>
+                <option value="Network">Network Issue</option>
+                <option value="Other">Other</option>
+            </select>
+            <div id="otherDetails">
+                <label for="otherDescription">Other Details:</label>
+                <textarea id="otherDescription" placeholder="Please provide additional details..." style="height: 100px;"></textarea>
+            </div>
+            <label for="description">Description:</label>
+            <textarea id="description" placeholder="Please describe the issue or request in detail." required style="height: 100px;"></textarea>
+            <button type="submit">Submit Request</button>
+        </form>
+        <div id="requests">
+            <!-- Requests will be displayed here -->
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"></script>
+    <script>
+              document.getElementById('requestForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value; // Added email field
+            const requestType = document.getElementById('requestType').value;
+            let description = document.getElementById('description').value;
+
+            // If 'Other' is selected, append additional details
+            if (requestType === 'Other') {
+                description += "\n\nAdditional Details:\n" + document.getElementById('otherDescription').value;
+            }
+
+            // Send HTTP POST request to the backend
+            axios.post('http://192.168.0.121:3000/submit-request', {  // Adjust the URL as needed
+                name: name,
+                email: email, // Include email in the request
+                requestType: requestType,
+                description: description
+            })
+            .then(function(response) {
+                console.log('Request submitted successfully:', response.data);
+                // Optionally, display a success message to the user
+                alert("Your request has been submitted successfully. We'll get back to you shortly.");
+            })
+            .catch(function(error) {
+                console.error('Error submitting request:', error);
+                // Display an error message to the user
+                alert("There was an error submitting your request. Please try again later.");
+            });
+
+            // Clear the form fields after submission
+            document.getElementById('name').value = '';
+            document.getElementById('email').value = ''; // Clear email field
+            document.getElementById('requestType').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('otherDescription').value = '';
+            document.getElementById('otherDetails').style.display = 'none';
+        });
+
+        function showOtherDetails() {
+            const otherDetails = document.getElementById('otherDetails');
+            const requestType = document.getElementById('requestType').value;
+            if (requestType === 'Other') {
+                otherDetails.style.display = 'block';
+            } else {
+                otherDetails.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

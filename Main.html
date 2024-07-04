@@ -1,0 +1,793 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<title>Company Intranet</title>
+<link rel="stylesheet" type="text/css" href="styles.css">
+<style>
+.dynamic-gallery-row {
+  display: flex;
+  flex-wrap: wrap;
+  /* Adjust the gap value as needed */
+}
+
+.dynamic-gallery-row img {
+  margin: 0; /* Reset default margin to remove any extra spacing */
+  padding: 10px;
+}
+
+
+
+</style>
+</head>
+<body>
+<!-- Header -->
+<div class="header">
+  <div class="navbar">
+    <div class="logo">
+      <img src="omni.jpeg" alt="Your Logo">
+    </div>
+    <h1>Company Intranet</h1>
+    <div id="userSection" style="display: none;">
+      <div class="user-profile">
+        <img src="user.jpg" alt="User Profile" id="userImage"> <!-- Add user image -->
+        <span id="welcomeMessage"></span>
+        <button class="logout-btn" onclick="confirmLogout()">Logout</button>
+         <div class="notification-icon" onclick="displayNotification()">
+    <span class="fa fa-bell"></span> <!-- Bell icon -->
+    <div class="notification-badge"></div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <!-- Sidebar Content -->
+  <h2 onclick="toggleSublinks('groupNews')">Group News</h2>
+  <ul id="groupNews" style="display: none;">
+  <li><a href="#" onclick="toggleContent('news')">News and Announcements</a></li>
+  <li><a href="#" onclick="toggleContent('calendar')">Event Calendar</a></li>
+   <li><a href="#" onclick="toggleContent('gallery')">Gallery</a></li> <!-- Added onclick event for the gallery -->
+  </ul>
+  <h2 onclick="toggleSublinks('hrAdmin')">HR & Admin</h2>
+  <ul id="hrAdmin" style="display: none;">
+    <li><a href="#">Attendance and Time Tracking</a></li>
+    <li><a href="#">Leave Management</a></li>
+    <li><a href="#" onclick="loadEmployeeDirectoryContent()">Employee Directory</a></li>
+  </ul>
+  <h2 onclick="toggleSublinks('projectManagement')">Project Management</h2>
+  <ul id="projectManagement" style="display: none;">
+    <li><a href="#">Project Workspaces</a></li>
+    <li><a href="#">Task Assignment and Tracking</a></li>
+    <li><a href="#">Document Repository</a></li>
+  </ul>
+  <h2 onclick="toggleSublinks('customSolutions')">Custom Solutions</h2>
+  <ul id="customSolutions" style="display: none;">
+    <li><a href="#">office & IT Support</a></li>
+    <li><a href="#">Booking Systems</a></li>
+    <li><a href="#">Feedback and Surveys</a></li>
+  </ul>
+  <h2 onclick="toggleSublinks('communicationTools')">Communication Tools</h2>
+  <ul id="communicationTools" style="display: none;">
+    <li><a href="#">Bulletin Boards</a></li>
+    <li><a href="#">Internal Messaging System</a></li>
+  </ul>
+  <h2 onclick="toggleSublinks('jobOpenings')">Job's Opening</h2>
+  <ul id="jobOpenings" style="display: none;">
+  <li><a href="#" onclick="loadPositionsContent()">Positions</a></li>
+    <li><a href="#" onclick="loadQAJobsContent()">QA Jobs</a></li>
+    <li><a href="#" onclick="loadDevelopmentJobsContent()">Development Jobs</a></li>
+  </ul>
+  <h2 onclick="toggleSublinks('employeesInduction')">Employees Induction</h2>
+  <ul id="employeesInduction" style="display: none;">
+    <li><a href="#" onclick="loadWelcomeMessage()">Welcome Message</a></li>
+    <li><a href="#" onclick="loadOfficeLayout()">Office Layout</a></li>
+    <li><a href="#" onclick="loadTeamIntroduction()">Team Introduction</a></li>
+    <li><a href="#" onclick="loadDosAndDontsContent()">Do's and Dont's</a></li>
+    <li><a href="#" onclick="loadQADEVContent()">QA & Dev Website</a></li>
+    <li><a href="#" onclick="loadCompanyOverview()">Company Overview</a></li>
+</ul>
+</div>
+
+<div id="calendarPlaceholder"></div>
+<div id="content"></div>
+<div id="companyOverviewContent" class="content-wrapper" style="display: none;"></div>
+<div id="content"></div>
+<!-- Create a container where the content will be loaded -->
+<div id="contentContainer"></div>
+
+<!-- News Content -->
+<div id="news" class="news-content">
+  <h2 class="news-heading">News and Announcements</h2><br>
+  <div class="content-wrapper">
+    <img src="news.jpg" alt="News Image" class="news-image">
+    <div class="text-wrapper">
+      <p>Experience transformation through solutions that mitigate congestion at the edge and core, ushering substantial enhancements in network performance. Our solutions are designed to empower without compromising on security or control, ensuring transparency in security protocols. Discover how we elevate LAN device usage while supercharging WAN traffic throughput, even in the face of internet congestion. Our solutions operate seamlessly at Layers 2-4, offering automated optimization or advanced configuration for encrypted TCP/UDP traffic.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Gallery Container -->
+<div id="gallery" class="gallery-container">
+   <h2 class="gallery-heading">Gallery</h2> <!-- Corrected class name to "gallery-heading" -->
+  <div class="gallery-row">
+    <img src="photo13.jpg" alt="Image 1" class="gallery-image" onclick="showLargePhoto('photo1-large.jpg')">
+    <img src="photo2.jpg" alt="Image 2" class="gallery-image" onclick="showLargePhoto('photo2-large.jpg')">
+    <img src="photo4.jpg" alt="Image 4" class="gallery-image" onclick="showLargePhoto('photo3-large.jpg')">
+     <img src="photo5.jpg" alt="Image 5" class="gallery-image" onclick="showLargePhoto('photo4-large.jpg')">
+     <img src="photo6.jpg" alt="Image 6" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+    <img src="photo7.jpg" alt="Image 7" class="gallery-image" onclick="showLargePhoto('image6-large.jpg')">
+    <img src="photo1.jpg" alt="Image 8" class="gallery-image" onclick="showLargePhoto('photo4-large.jpg')">
+    <img src="photo9.jpg" alt="Image 9" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+    <img src="photo10.jpg" alt="Image 10" class="gallery-image" onclick="showLargePhoto('image6-large.jpg')">
+  </div>
+
+  <div class="gallery-row">
+     <img src="photo11.jpg" alt="Image 11" class="gallery-image" onclick="showLargePhoto('photo4-large.jpg')">
+    <img src="photo12.jpg" alt="Image 12" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+    <img src="photo8.jpg" alt="Image 8" class="gallery-image" onclick="showLargePhoto('image6-large.jpg')">
+    <img src="photo23.jpg" alt="Image 13" class="gallery-image" onclick="showLargePhoto('photo4-large.jpg')">
+    <img src="photo14.jpg" alt="Image 14" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+    <img src="photo15.jpg" alt="Image 15" class="gallery-image" onclick="showLargePhoto('image6-large.jpg')">
+    <img src="photo16.jpg" alt="Image 16" class="gallery-image" onclick="showLargePhoto('photo4-large.jpg')">
+     <img src="photo17.jpg" alt="Image 17" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+    <img src="photo18.jpg" alt="Image 18" class="gallery-image" onclick="showLargePhoto('image6-large.jpg')">
+      </div>
+
+  <div class="gallery-row">
+      <img src="photo19.jpg" alt="Image 19" class="gallery-image" onclick="showLargePhoto('photo4-large.jpg')">
+    <img src="photo20.jpg" alt="Image 20" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+    <img src="photo21.jpg" alt="Image 21" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+    <img src="photo22.jpg" alt="Image 22" class="gallery-image" onclick="showLargePhoto('image6-large.jpg')">
+    <img src="photo27.jpg" alt="Image 23" class="gallery-image" onclick="showLargePhoto('photo4-large.jpg')">
+    <img src="photo24.jpg" alt="Image 24" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+    <img src="photo28.jpg" alt="Image 25" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+    <img src="photo29.jpg" alt="Image 26" class="gallery-image" onclick="showLargePhoto('image6-large.jpg')">
+    <img src="photo26.jpg" alt="Image 28" class="gallery-image" onclick="showLargePhoto('photo4-large.jpg')">
+  </div>
+
+  <div class="dynamic-gallery-row"> <!-- Your dynamic gallery row content here -->
+
+  </div>
+
+</div>
+
+<div class="large-photo-container" id="largePhotoContainer">
+    <img src="" alt="Enlarged Image" class="large-photo" id="enlargedImage">
+    <button onclick="prevImage()" id="prevBtn">&#9664;</button> <!-- Left arrow symbol -->
+    <button onclick="nextImage()" id="nextBtn">&#9654;</button> <!-- Right arrow symbol -->
+    <button onclick="closeImage()" id="closeBtn">&times;</button> <!-- Close button (X mark) -->
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <p>&copy; 2024 Company Intranet. All rights reserved.</p>
+</div>
+
+<script>
+
+ // Function to check if user is logged in
+    function isLoggedIn() {
+        // Implement your logic to check if user is logged in
+        // For demonstration, always return true
+        return true;
+    }
+
+    // Function to display user info and logout button
+    function displayUserInfo() {
+        var userSection = document.getElementById("userSection");
+        var welcomeMessage = document.getElementById("welcomeMessage");
+        var userImage = document.getElementById("userImage");
+
+        // Get username from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('username');
+
+        // Set user image source (replace 'user.jpg' with the actual path to the user's image)
+        userImage.src = "user.jpg"; // Change this to the actual path of the user's image
+
+        // Display username and logout button
+        welcomeMessage.innerText = 'Welcome, ' + username;
+        userSection.style.display = 'flex'; // Change display to flex
+    }
+
+    // Function to handle logout confirmation
+    function confirmLogout() {
+        if (confirm("Are you sure you want to logout?")) {
+            logout();
+        }
+    }
+
+    // Function to handle logout
+    function logout() {
+        // Implement your logout logic here
+        alert('Logout successful'); // For demonstration
+        // Redirect user to logout page or clear session
+        window.location.href = "index.html"; // Redirect to index.html
+    }
+function displayNotification() {
+    var notificationIcon = document.querySelector('.notification-icon');
+    var notificationBadge = document.querySelector('.notification-badge');
+
+    // Toggle the class to show/hide the notification bar
+    notificationIcon.classList.toggle('active');
+
+    // Toggle the display of the notification badge based on its current state
+    if (notificationBadge.style.display === 'none') {
+        notificationBadge.style.display = 'flex'; // Display the badge
+    } else {
+        notificationBadge.style.display = 'none'; // Hide the badge
+    }
+
+    // Increment the badge count or perform other actions as needed
+    // For demonstration, let's increment the badge count
+    var currentCount = parseInt(notificationBadge.textContent);
+    if (!isNaN(currentCount)) {
+        notificationBadge.textContent = currentCount + 1;
+    } else {
+        notificationBadge.textContent = 1;
+    }
+}
+
+
+function toggleContent(contentId) {
+    // Close any previously open content sections
+    var contentSections = document.querySelectorAll('.news-content, .gallery-container, .calendar-container, .jobs-content, .induction-content');
+    contentSections.forEach(function (section) {
+        section.style.display = 'none';
+    });
+
+    // Close any open sublinks
+    closeOpenSublinks();
+
+    // Hide or remove the calendar content if it was previously loaded
+    var calendarContainer = document.getElementById('calendarPlaceholder');
+    calendarContainer.innerHTML = ''; // Remove calendar content from the placeholder
+
+    // Clear the content of the Company Overview section
+    document.getElementById('companyOverviewContent').style.display = 'none'; // Hide the Company Overview content
+
+    // Close the jobs opening content
+    var jobsOpeningContent = document.getElementById('contentContainer');
+    jobsOpeningContent.innerHTML = ''; // Remove jobs opening content
+
+    // Show the selected content
+    if (contentId === 'calendar') {
+        loadCalendar(); // Load calendar content dynamically
+    } else {
+        // Show the selected content section
+        var selectedContent = document.getElementById(contentId);
+        if (selectedContent) {
+            selectedContent.style.display = 'block';
+        }
+    }
+}
+
+function toggleSublinks(sectionId) {
+    // Hide all sublinks
+    var sublinks = document.querySelectorAll('.sidebar ul');
+    sublinks.forEach(function(link) {
+        link.style.display = 'none';
+    });
+
+    // Display only the selected sublink
+    var selectedSublink = document.getElementById(sectionId);
+    if (selectedSublink) {
+        selectedSublink.style.display = 'block';
+    }
+
+    // Close any previously open content
+    closeOpenContent();
+}
+
+ // Function to close open sublink pages
+function closeOpenSublinks() {
+    // Hide all sublink pages
+    var sublinkPages = document.querySelectorAll('.news-content, .gallery-container, .calendar-container');
+    sublinkPages.forEach(function(page) {
+        page.style.display = 'none';
+    });
+
+    // Hide or remove the calendar content if it was previously loaded
+    var calendarContainer = document.getElementById('calendarPlaceholder');
+    calendarContainer.innerHTML = ''; // Remove calendar content from the placeholder
+}
+
+// Attach click event listeners to the main menu links
+document.querySelectorAll('.sidebar h2').forEach(function(mainLink) {
+    mainLink.addEventListener('click', function() {
+        // Close any open sublink pages
+        closeOpenSublinks();
+    });
+});
+
+    function showContent(contentId) {
+        // Hide all content divs
+        var contents = document.getElementsByClassName('content');
+        for (var i = 0; i < contents.length; i++) {
+            contents[i].style.display = 'none';
+        }
+
+        // Show the selected content div
+        var selectedContent = document.getElementById(contentId);
+        if (selectedContent) {
+            selectedContent.style.display = 'block';
+        }
+    }
+
+    // Function to close open content sections
+function closeOpenContent() {
+    var contentSections = document.querySelectorAll('.news-content, .gallery-container, .calendar-container, .jobs-content, .induction-content');
+    contentSections.forEach(function (section) {
+        section.style.display = 'none';
+    });
+
+    // Close the jobs opening content
+    var jobsOpeningContent = document.getElementById('contentContainer');
+    jobsOpeningContent.innerHTML = ''; // Remove jobs opening content
+}
+
+// Function to load calendar content dynamically
+function loadCalendar() {
+    var calendarContainer = document.getElementById('calendarPlaceholder'); // Placeholder for calendar content
+    // Make an AJAX request to fetch calendar content
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                calendarContainer.innerHTML = xhr.responseText; // Insert the calendar HTML into the placeholder
+                // Execute scripts from calendar.html
+                executeCalendarScripts();
+            } else {
+                console.error('Failed to load calendar content: HTTP status ' + xhr.status);
+                calendarContainer.innerHTML = '<p>Failed to load calendar content. Please try again later.</p>';
+            }
+        }
+    };
+    xhr.open('GET', 'calendar.html', true);  // Load calendar.html content
+    xhr.send();
+}
+
+function executeCalendarScripts() {
+    // Get all script tags from the loaded calendar content
+    var scripts = document.getElementById('calendarPlaceholder').querySelectorAll('script');
+
+    // Execute each script
+    scripts.forEach(function(script) {
+        var newScript = document.createElement('script');
+        newScript.text = script.innerText;
+        document.body.appendChild(newScript);
+        // Remove the original script after execution to prevent multiple executions
+        script.parentNode.removeChild(script);
+    });
+}
+
+
+// Function to close the enlarged image
+function closeImage() {
+    var largePhotoContainer = document.getElementById("largePhotoContainer");
+    largePhotoContainer.style.display = "none";
+}
+    // Attach click event listeners to all gallery images
+    var galleryImages = document.querySelectorAll(".gallery-image");
+    galleryImages.forEach(function(img) {
+        img.addEventListener("click", function() {
+            var enlargedImage = document.getElementById("enlargedImage");
+            enlargedImage.src = img.src; // Set the source of the enlarged image to the clicked image
+            var largePhotoContainer = document.getElementById("largePhotoContainer");
+            largePhotoContainer.style.display = "flex"; // Show the large photo container
+        });
+    });
+
+var currentImageIndex = 0;
+var images = [];
+var largePhotoContainer = document.getElementById("largePhotoContainer");
+var enlargedImage = document.getElementById("enlargedImage");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+
+function showLargePhoto(imageSrc) {
+  enlargedImage.src = imageSrc;
+  largePhotoContainer.style.display = "flex";
+  currentImageIndex = images.findIndex(img => img === imageSrc);
+}
+
+function prevImage() {
+  currentImageIndex = (currentImageIndex - 1 + images.length + dynamicImages.length) % (images.length + dynamicImages.length);
+  if (currentImageIndex < images.length) {
+    enlargedImage.src = images[currentImageIndex];
+  } else {
+    enlargedImage.src = dynamicImages[currentImageIndex - images.length];
+  }
+}
+
+
+function nextImage() {
+  currentImageIndex = (currentImageIndex + 1) % (images.length + dynamicImages.length);
+  if (currentImageIndex < images.length) {
+    enlargedImage.src = images[currentImageIndex];
+  } else {
+    enlargedImage.src = dynamicImages[currentImageIndex - images.length];
+  }
+}
+
+  var galleryImages = document.querySelectorAll(".gallery-image");
+  galleryImages.forEach(function(img) {
+    img.addEventListener("click", function() {
+      enlargedImage.src = img.src; // Set the source of the enlarged image to the clicked image
+      largePhotoContainer.style.display = "flex"; // Show the large photo container
+      currentImageIndex = Array.from(galleryImages).indexOf(img); // Set the current image index
+    });
+    images.push(img.src); // Push the image source to the images array
+  });
+
+    function closeImage() {
+  largePhotoContainer.style.display = "none";
+}
+
+// Function to handle click event on images in dynamic-gallery-row
+function showLargePhotoDynamic(imageSrc) {
+    enlargedImage.src = imageSrc;
+    largePhotoContainer.style.display = "flex";
+    currentImageIndex = dynamicImages.findIndex(img => img === imageSrc);
+}
+var dynamicImages = []; // Initialize dynamicImages array
+
+// Updated function to fetch and display images for dynamic-gallery-row
+function fetchAndDisplayDynamicImages() {
+    fetch('http://192.168.0.121:3000/images')
+    .then(response => response.json())
+    .then(data => {
+        dynamicImages = data.images || []; // Populate the dynamicImages array
+        const dynamicContent = document.querySelector('.dynamic-gallery-row');
+
+        // Clear previous content
+        dynamicContent.innerHTML = '';
+
+        // Create image elements and append to dynamic content div
+        dynamicImages.forEach((imagePath, index) => {
+            const image = document.createElement('img');
+            image.src = imagePath;
+            image.width = 105; // Adjust width as needed
+            image.height = 100; // Adjust height as needed
+            dynamicContent.appendChild(image);
+
+            // Attach click event listener to each image
+            image.addEventListener("click", function() {
+                showLargePhotoDynamic(imagePath);
+            });
+        });
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while fetching dynamic images');
+    });
+}
+
+// Function to handle click event on images in dynamic-gallery-row
+function showLargePhotoDynamic(imageSrc) {
+    enlargedImage.src = imageSrc;
+    largePhotoContainer.style.display = "flex";
+    // Calculate the current image index within the combined array of static and dynamic images
+    currentImageIndex = images.length + dynamicImages.findIndex(img => img === imageSrc);
+}
+
+
+// Call the function to fetch and display images when the page loads
+// Call the function to fetch and display dynamic images when the page loads
+fetchAndDisplayDynamicImages();
+
+
+
+  // Function to load welcome message
+function loadWelcomeMessage() {
+  closeCompanyOverviewContent(); // Call the function to close the open content
+    // Close any open HTML pages
+    closeOpenHtmlPages();
+
+    // Load the welcome message content
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                document.getElementById('content').innerHTML = xhr.responseText;
+            } else {
+                console.error('Failed to load welcome message content: HTTP status ' + xhr.status);
+                document.getElementById('content').innerHTML = '<p>Failed to load welcome message content. Please try again later.</p>';
+            }
+        }
+    };
+    xhr.open('GET', 'welcomemsg.html', true);
+    xhr.send();
+}
+
+// Function to close open HTML pages
+function closeOpenHtmlPages() {
+    document.getElementById('content').innerHTML = ''; // Clear the content div
+}
+
+// Modify sidebar menu item click handlers
+document.querySelectorAll('.sidebar ul li a').forEach(function(link) {
+    link.addEventListener('click', function(event) {
+        // Close any open HTML pages
+        closeOpenHtmlPages();
+    });
+});
+
+// Function to load Do's and Dont's content
+function loadDosAndDontsContent() {
+  closeCompanyOverviewContent(); // Call the function to close the open content
+    // Make an AJAX request to fetch the content from "rules.html"
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                // Replace the content of the content container with the content from "rules.html"
+                document.getElementById('content').innerHTML = xhr.responseText; // Changed to 'content' from 'contentContainer'
+            } else {
+                console.error('Failed to load Do\'s and Dont\'s content: HTTP status ' + xhr.status);
+                // Display an error message or handle the error as needed
+            }
+        }
+    };
+    xhr.open('GET', 'rules.html', true);
+    xhr.send();
+}
+// Function to close the company overview content
+function closeCompanyOverviewContent() {
+    document.getElementById('companyOverviewContent').innerHTML = ''; // Clear the content
+    document.getElementById('companyOverviewContent').style.display = 'none'; // Hide the container
+}
+// Function to load company overview content
+function loadCompanyOverview() {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                // Inject the response HTML into the companyOverviewContent div
+                document.getElementById('companyOverviewContent').innerHTML = xhr.responseText;
+                // Display the loaded content
+                document.getElementById('companyOverviewContent').style.display = 'block';
+
+                // Execute scripts in the loaded content
+                executeScriptsInContent(document.getElementById('companyOverviewContent'));
+            } else {
+                console.error('Failed to load company overview content: HTTP status ' + xhr.status);
+                // Display an error message in the companyOverviewContent div
+                document.getElementById('companyOverviewContent').innerHTML = '<p>Failed to load company overview content. Please try again later.</p>';
+                // Display the error message
+                document.getElementById('companyOverviewContent').style.display = 'block';
+            }
+        }
+    };
+
+    // Open a GET request to fetch the cmpnyoverview.html content
+    xhr.open('GET', 'cmpnyoverview.html', true);
+    // Send the request
+    xhr.send();
+}
+
+// Function to execute scripts in the loaded content
+function executeScriptsInContent(container) {
+    // Get all script tags within the loaded content
+    var scripts = container.querySelectorAll('script');
+    scripts.forEach(function(script) {
+        var newScript = document.createElement('script');
+        newScript.text = script.innerText;
+        // Execute the script
+        document.body.appendChild(newScript);
+        // Remove the original script after execution to prevent multiple executions
+        script.parentNode.removeChild(script);
+    });
+}
+
+  // Function to load office layout content
+  function loadOfficeLayout() {
+     closeCompanyOverviewContent(); // Call the function to close the open content
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          // Inject the response HTML into the content div
+          document.getElementById('content').innerHTML = xhr.responseText;
+        } else {
+          console.error('Failed to load office layout content: HTTP status ' + xhr.status);
+          // Display an error message in the content div
+          document.getElementById('content').innerHTML = '<p>Failed to load office layout content. Please try again later.</p>';
+        }
+      }
+    };
+
+    // Open a GET request to fetch the officelayout.html content
+    xhr.open('GET', 'officelayout.html', true);
+    // Send the request
+    xhr.send();
+  }
+  function loadTeamIntroduction() {
+     closeCompanyOverviewContent(); // Call the function to close the open content
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          // Inject the response HTML into the content div
+          document.getElementById('content').innerHTML = xhr.responseText;
+        } else {
+          console.error('Failed to load team introduction content: HTTP status ' + xhr.status);
+          // Display an error message in the content div
+          document.getElementById('content').innerHTML = '<p>Failed to load team introduction content. Please try again later.</p>';
+        }
+      }
+    };
+
+    // Open a GET request to fetch the teamintro.html content
+    xhr.open('GET', 'teamintro.html', true);
+    // Send the request
+    xhr.send();
+  }
+  // Function to load QA & Dev Website content
+function loadQADEVContent() {
+   closeCompanyOverviewContent(); // Call the function to close the open content
+  // Make an AJAX request to fetch the content from "Qadev.html"
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        // Replace the content of the current page with the content from "Qadev.html"
+        document.getElementById('content').innerHTML = xhr.responseText;
+      } else {
+        console.error('Failed to load QA & Dev Website content: HTTP status ' + xhr.status);
+        // Display an error message or handle the error as needed
+      }
+    }
+  };
+  xhr.open('GET', 'Qadev.html', true);
+  xhr.send();
+}
+
+function loadPositionsContent() {
+   closeCompanyOverviewContent(); // Call the function to close the open content
+    // Make an AJAX request to fetch the content from "position.html"
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          // Replace the content of the current page with the content from "position.html"
+          document.getElementById('content').innerHTML = xhr.responseText;
+        } else {
+          console.error('Failed to load Positions content: HTTP status ' + xhr.status);
+          // Display an error message or handle the error as needed
+        }
+      }
+    };
+    xhr.open('GET', 'position.html', true);
+    xhr.send();
+}
+
+ function loadQAJobsContent() {
+   closeCompanyOverviewContent(); // Call the function to close the open content
+    // Make an AJAX request to fetch the content from "qa.html"
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          // Replace the content of the content container with the content from "qa.html"
+          document.getElementById('content').innerHTML = xhr.responseText;
+        } else {
+          console.error('Failed to load QA Jobs content: HTTP status ' + xhr.status);
+          // Display an error message or handle the error as needed
+        }
+      }
+    };
+    xhr.open('GET', 'Qa.html', true);
+    xhr.send();
+  }
+
+  // Function to load Development Jobs content
+  function loadDevelopmentJobsContent() {
+     closeCompanyOverviewContent(); // Call the function to close the open content
+    // Make an AJAX request to fetch the content from "dev.html"
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          // Replace the content of the content container with the content from "dev.html"
+          document.getElementById('content').innerHTML = xhr.responseText;
+        } else {
+          console.error('Failed to load Development Jobs content: HTTP status ' + xhr.status);
+          // Display an error message or handle the error as needed
+        }
+      }
+    };
+    xhr.open('GET', 'dev.html', true);
+    xhr.send();
+  }
+// Function to load Employee Directory content
+function loadEmployeeDirectoryContent() {
+    // Make an AJAX request to fetch the content from "employee.html"
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                // Replace the content of the content container with the content from "employee.html"
+                document.getElementById('contentContainer').innerHTML = xhr.responseText;
+                // Execute scripts in the loaded content
+                executeScriptsInContent(document.getElementById('contentContainer'));
+            } else {
+                console.error('Failed to load Employee Directory content: HTTP status ' + xhr.status);
+                // Display an error message or handle the error as needed
+            }
+        }
+    };
+    xhr.open('GET', 'empdir.html', true);
+    xhr.send();
+}
+// Function to load the bulletin board content
+function loadBulletinBoardContent() {
+    // Make an AJAX request to fetch the content from "bulletin.html"
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                // Replace the content of the content container with the content from "bulletin.html"
+                document.getElementById('content').innerHTML = xhr.responseText;
+
+                // Reinitialize any event listeners or scripts related to the modal functionality
+                initializeModalFunctionality();
+            } else {
+                console.error('Failed to load Bulletin Board content: HTTP status ' + xhr.status);
+                // Display an error message or handle the error as needed
+            }
+        }
+    };
+    xhr.open('GET', 'bulletin.html', true);
+    xhr.send();
+}
+
+// Function to initialize modal functionality
+function initializeModalFunctionality() {
+    // Add your code here to initialize event listeners or scripts related to the modal functionality
+    // For example, you may need to reattach event listeners for posting announcements or closing the modal
+}
+
+// Attach click event listener to the "Bulletin Board" link
+document.querySelector('#communicationTools a[href="#"]').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent default link behavior
+    loadBulletinBoardContent(); // Load bulletin board content
+});
+
+// Run this function when the page loads
+    window.onload = function() {
+        // Display user info
+        displayUserInfo();
+
+        // Check for new notifications
+        // Example: Check for notifications every 5 seconds
+        setInterval(function() {
+            // Replace this with your actual code to check for notifications
+            var hasNewNotifications = checkForNewNotifications();
+            if (hasNewNotifications) {
+                // Example: Display a notification message
+                displayNotification("You have new notifications!");
+            }
+        }, 5000); // 5000 milliseconds = 5 seconds
+    };
+
+    // Function to simulate checking for new notifications
+    function checkForNewNotifications() {
+        // Replace this with your actual code to check for new notifications
+        // For demonstration, return true randomly
+        return Math.random() < 0.5;
+    }
+// Set the header text color to white
+document.querySelector('.header h1').style.color = 'white';
+</script>
+
+</body>
+</html>

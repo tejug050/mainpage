@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Image Slider</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        .slider-container {
+            overflow: hidden;
+            height: 100%; /* Full height of the viewport */
+            width: 100%; /* Full width of the viewport */
+        }
+
+        .slider {
+            display: flex;
+            width: 10000px; /* Large enough to fit all slides side by side */
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .slide {
+            flex: 0 0 auto;
+            width: 100vw; /* Width of each slide */
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide img {
+            width: 400px; /* Fixed width for the images */
+            height: 400px; /* Fixed height for the images */
+            object-fit: cover; /* Maintain aspect ratio */
+            border-radius: 50%; /* Rounded image */
+            margin-bottom: 20px;
+        }
+
+        .slide p {
+            margin: 10px 0;
+            font-size: 1.2em;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="slider-container">
+        <div class="slider" id="slider">
+            <!-- Add images for employees here -->
+            <div class="slide">
+                <img src="onkar.jfif" alt="Employee 1">
+                <p><strong>Onkar Singh</strong><br>CEO<br>Omni-Techsolutions</p>
+            </div>
+            <div class="slide">
+                <img src="raaj.jfif" alt="Employee 2">
+                <p><strong>Raaj Dev</strong><br>Project Manager<br>Omni-Techsolutions</p>
+            </div>
+            <div class="slide">
+                <img src="rajvir.jfif" alt="Employee 3">
+                <p><strong>Rajvir Singh</strong><br>Senior System Software Engineer<br>Omni-Techsolutions</p>
+            </div>
+            <div class="slide">
+                <img src="jasdeep.jfif" alt="Employee 4">
+                <p><strong>Jasdeep</strong><br>System Software Engineer<br>Omni-Techsolutions</p>
+            </div>
+            <div class="slide">
+                <img src="shalini.jfif" alt="Employee 5">
+                <p><strong>Shalini</strong><br>Senior QA & Web Developer<br>Omni-Techsolutions</p>
+            </div>
+            <div class="slide">
+                <img src="theju.jfif" alt="Employee 6">
+                <p><strong>Theju</strong><br>Junior QA & Web Developer<br>Omni-Techsolutions</p>
+            </div>
+            <div class="slide">
+                <img src="divya.jfif" alt="Employee 7">
+                <p><strong>Divya</strong><br>Junior QA<br>Omni-Techsolutions</p>
+            </div>
+            <div class="slide">
+                <img src="shreyas.jfif" alt="Employee 8">
+                <p><strong>Shreyas</strong><br>Junior Linux Software Developer<br>Omni-Techsolutions</p>
+            </div>
+            <div class="slide">
+                <img src="lakshmi.jfif" alt="Employee 9">
+                <p><strong>Lakshmi</strong><br>Android Developer<br>Omni-Techsolutions</p>
+            </div>
+            <div class="slide">
+                <img src="kajal.jfif" alt="Employee 10">
+                <p><strong>Kajal</strong><br>Junior Linux Software Developer<br>Omni-Techsolutions</p>
+            </div>
+            <div class="slide">
+                <img src="sunil.jfif" alt="Employee 11">
+                <p><strong>Sunil</strong><br>Junior Linux Trainee Software Developer<br>Omni-Techsolutions</p>
+            </div>
+            <div class="slide">
+                <img src="chandru.jfif" alt="Employee 11">
+                <p><strong>Chandru</strong><br>Office Administrator<br>Omni-Techsolutions</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slider = document.getElementById('slider');
+            const slides = document.querySelectorAll('.slide');
+            let currentIndex = 0;
+
+            function autoSlide() {
+                currentIndex++;
+                if (currentIndex >= slides.length) {
+                    currentIndex = 0;
+                    slider.style.transition = 'none'; // Remove transition to jump directly
+                    slider.style.transform = `translateX(0)`;
+                    setTimeout(() => {
+                        slider.style.transition = 'transform 0.5s ease-in-out'; // Reapply transition after 0.1s
+                    }, 100);
+                } else {
+                    slider.style.transform = `translateX(-${currentIndex * 100}vw)`; // Slide width is 100vw
+                }
+            }
+
+            setInterval(autoSlide, 3000); // Change slide every 3 seconds
+        });
+    </script>
+</body>
+</html>

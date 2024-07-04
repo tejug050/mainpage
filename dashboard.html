@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,76 +8,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <title>Company Intranet</title>
-<style>
-    /* Bookings Display */
-    #bookingsDisplay {
-      width: 50%;
-      margin-top: 20px;
-    }
 
-    #bookingsDisplay table {
-      width: 50%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      background-color: white;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    #bookingsDisplay th, #bookingsDisplay td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-
-    #bookingsDisplay th {
-      background-color: #f2f2f2;
-      color: #333;
-    }
-
-    #bookingsDisplay tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-
-    #bookingsDisplay tr:hover {
-      background-color: #ddd;
-    }
-</style>
-<!--<style>
-  /* Table styles */
-  #discussionTable {
-    width: 70%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
-
-  #discussionTable th, #discussionTable td {
-    border: 1px solid #dddddd;
-    padding: 8px;
-    text-align: left;
-  }
-
-  #discussionTable th {
-    background-color: #f2f2f2;
-  }
-
-  #discussionTable tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-
-  #discussionTable tr:hover {
-    background-color: #f2f2f2;
-  }
-
-  /* Post container */
-  .post {
-    cursor: pointer;
-  }
-
-  .post:hover {
-    background-color: #f0f0f0;
-  }
-</style>-->
 
 <style>
     /* Reset some default styles */
@@ -122,30 +52,6 @@ body {
 h1 {
   flex: 1;
   font-size: 24px;
-}
-
-.user-profile {
-  display: flex;
-  align-items: center;
-}
-
-.user-profile img {
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-.logout-btn {
-  background-color: #e63946;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 3px;
-  cursor: pointer;
-}
-
-.logout-btn:hover {
-  background-color: #d62828;
 }
 
 /* Main container to hold sidebar and content side by side */
@@ -198,7 +104,7 @@ h1 {
 }
 
 .iframe-container {
-  width: 380%;
+  width: 310%;
   height: calc(150vh - 250px); /* Adjust height based on header and footer */
   border: 0px solid white;
   border-radius: 5px;
@@ -300,29 +206,48 @@ h1 {
 .swiper-container {
     height: 400px; /* Adjust height as needed */
 }
-.header {
-  background-color: #005f73;
-  color: white;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap; /* Allow items to wrap to the next line */
+.table-container {
+    width: 90%;
+    max-width: 900px; /* Adjust the value as needed */
+    margin: 100px auto;
+}
+/* Feedback table style */
+#feedbackTable table {
+    width: 100%; /* Make the table fill the container */
+    max-width: 650px;
+}
+/* Table style */
+table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-  .logout-btn {
-    background-color: rgba(230, 57, 70, 0.8); /* Adjust opacity and color */
-    color: white;
-    border: none;
-    padding: 8px 15px; /* Increase padding for better visibility */
-    border-radius: 3px;
-    cursor: pointer;
-    margin-left: 10px; /* Create some space between the welcome message and logout button */
-  }
+table, th, td {
+    border: 1px solid black;
+    padding: 8px;
+}
 
-  .logout-btn:hover {
-    background-color: rgba(214, 40, 40, 0.8); /* Darker shade on hover */
-  }
+th {
+    background-color: #f2f2f2;
+}
+   .user-select-container {
+            display: flex;
+            align-items: center;
+            gap: 0px;
+            margin-top: 20px;
+        }
+
+        .user-select-container select {
+            flex-grow: 1;
+            min-width: 200px;
+        }
+
+        #userDetails {
+            margin-top: 20px;
+            padding: 20px;
+            background: #e9f7ef;
+            border-radius: 8px;
+        }
 </style>
 
 </head>
@@ -334,17 +259,7 @@ h1 {
       <img src="omni.jpeg" alt="Your Logo">
     </div>
     <h1>INTRANET</h1>
-    <div id="userSection" style="display: none;">
-      <div class="user-profile">
-  <img src="user.jpg" alt="User Profile" id="userImage">
-  <span id="welcomeMessage"></span><br>
-  <button class="logout-btn" onclick="confirmLogout()">Logout</button>
-</div>
-
-    </div>
   </div>
-  <a href="#" onclick="loadBookingDisplay()" style="color: white;">Click here to see today's booking slots</a>
-
 </div>
 
 <!-- Main container -->
@@ -354,12 +269,12 @@ h1 {
     <h2 onclick="toggleSublinks('groupNews')">Group News</h2>
     <ul id="groupNews" style="display: none;">
       <li><a href="#" onclick="toggleContent('news')">News and Announcements</a></li>
-      <li><a href="#" onclick="toggleContent('calendar')">Event Calendar</a></li>
-      <li><a href="#" onclick="toggleContent('gallery')">Gallery</a></li>
+      <li><a href="#" onclick="loadIframe('B_cal.html')">Event Calendar</a></li>
+      <li><a href="#" onclick="loadIframe('B_gall.html')">Gallery</a></li>
     </ul>
     <h2 onclick="toggleSublinks('hrAdmin')">HR & Admin</h2>
     <ul id="hrAdmin" style="display: none;">
-      <li><a href="#" onclick="loadAttendanceContent()">Attendance and Time Tracking</a></li>
+        <li><a href="#" onclick="loadAttendanceContent()">Attendance and Time Tracking</a></li>
       <li><a href="#" onclick="loadLeaveManagementContent()">Leave Management</a></li>
       <li><a href="#" onclick="loadEmployeeDirectoryContent()">Employee Directory</a></li>
     </ul>
@@ -377,7 +292,7 @@ h1 {
     </ul>
     <h2 onclick="toggleSublinks('communicationTools')">Communication Tools</h2>
     <ul id="communicationTools" style="display: none;">
-      <li><a href="#" onclick="loadBulletinBoardContent();">Discussion Form</a></li>
+      <li><a href="#" onclick="loadBulletinBoardContent();">Bulletin Board</a></li>
     </ul>
     <h2 onclick="toggleSublinks('jobOpenings')">Job's Opening</h2>
     <ul id="jobOpenings" style="display: none;">
@@ -399,10 +314,7 @@ h1 {
       <li><a href="#" onclick="loadvendorListContent()">Vendors List</a></li>
     </ul>
   </div>
-  <div id="bookingsDisplay" style="display: none;"></div>
-
-
-
+<div id="bookingsDisplay"></div>
 <div id="discussionPosts"></div>
   <!-- Content -->
   <div id="iframeWrapper" style="display: none;">
@@ -419,7 +331,7 @@ h1 {
       <input type="password" id="password" name="password" required>
 
       <input type="submit" value="Login">
-      <p>If you don't have an account, <a href="#" onclick="toggleSignupForm()">sign up here</a>.</p>
+
     </form>
   </div>
 
@@ -456,10 +368,7 @@ h1 {
       </div>
 
       <input type="submit" value="Sign Up">
-      <a href="#" onclick="loadBookingDisplay()" style="color: white;">Click here to see today's booking slots</a>
-
-
-
+      <p>If you already have an account, <a href="#" onclick="toggleSignupForm()">login here</a>.</p>
     </form>
   </div>
 </div>
@@ -485,150 +394,67 @@ h1 {
 
   document.addEventListener('DOMContentLoaded', function() {
   displayUserInfo(); // Check and display user info on page load
-
+   loadBookingDisplay();
     loadDiscussionPosts(); // Load discussion posts
 
 });
-  function handleSignup(event) {
-  event.preventDefault(); // Prevent form submission
 
-  // Gather form data
-  var formData = {
-    username: document.getElementById("signupUsername").value,
-    password: document.getElementById("signupPassword").value,
-    confirmPassword: document.getElementById("confirmPassword").value,
-    email: document.getElementById("email").value,
-    phone: document.getElementById("phone").value,
-     zip: document.getElementById("zip").value, // Retrieve zip code value
-    gender: document.querySelector('input[name="gender"]:checked').value
-  };
 
-  // Make AJAX request to signup endpoint
-  fetch('http://192.168.0.121:3000/signup', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(formData)
-  })
-  .then(response => response.json())
-  .then(data => {
-    alert(data.message); // Display server response
-    toggleSignupForm(); // Redirect to login form
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+var isLoggedIn = false;
 
-  return false;
-}
-
-// Function to handle successful login
+// Function to handle login
 function handleLogin(event) {
   event.preventDefault(); // Prevent form submission
 
-  // Gather form data
-  var formData = {
-    username: document.getElementById("username").value,
-    password: document.getElementById("password").value
-  };
+  var username = document.getElementById('username').value;
+  var password = document.getElementById('password').value;
 
-  // Make AJAX request to login endpoint
-  fetch('http://192.168.0.121:3000/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(formData)
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Invalid credentials');
-    }
-    return response.json();
-  })
-  .then(data => {
-    alert(data.message); // Display server response
-
-    // Store username in localStorage
-    localStorage.setItem('username', formData.username);
-
-    // Display user info in the header
-    displayUserInfo();
-
-    // Hide login form and show iframe container
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('iframeWrapper').style.display = 'block';
-
-    loadIframe('slide.html');
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    alert(error.message); // Display error message
-  });
-}
-</script>
-
-<script>
-
-function isLoggedIn() {
-  return localStorage.getItem('username') !== null;
-}
-
-
-function displayUserInfo() {
-  var userSection = document.getElementById("userSection");
-  var welcomeMessage = document.getElementById("welcomeMessage");
-  var userImage = document.getElementById("userImage");
-  var loginForm = document.getElementById("loginForm"); // Get the login form element
- var discussionPosts = document.getElementById('discussionPosts');
- var bookingsDisplay = document.getElementById('bookingsDisplay');
-  // Retrieve username from localStorage
-  var username = localStorage.getItem('username');
-
-  if (username) {
-    // Set user image source (replace 'user.jpg' with the actual path to the user's image)
-    userImage.src = "user.jpg"; // Change this to the actual path of the user's image
-
-    // Display username and logout button
-    welcomeMessage.innerText = 'Welcome, ' + username;
-    userSection.style.display = 'flex'; // Change display to flex
+  // Check if username and password are correct (for example: 'admin' and 'admin123')
+  if (username === 'admin' && password === 'admin123') {
+    isLoggedIn = true; // Set isLoggedIn to true upon successful login
 
     // Hide login form
-    loginForm.style.display = 'none';
+    document.getElementById('loginForm').style.display = 'none';
+
+    // Show iframe wrapper
     document.getElementById('iframeWrapper').style.display = 'block';
-     discussionPosts.style.display = 'block';
-     bookingsDisplay.style.display = 'none';
+
+    // Optionally, load default content into the iframe upon login
+
+
+    // Optional: Display a success message
+    alert('Login successful!');
+  } else {
+    alert('Invalid credentials! Please try again.'); // Display error message
   }
 }
 
-    // Function to handle logout confirmation
-    function confirmLogout() {
-        if (confirm("Are you sure you want to logout?")) {
-            logout();
-        }
-    }
-
-    function logout() {
-    // Implement your logout logic here
-    alert('Logout successful'); // For demonstration
-    localStorage.removeItem('username'); // Remove specific item
-
-    // Hide user profile section and show login form
-    document.getElementById('userSection').style.display = 'none';
-    document.getElementById('iframeWrapper').style.display = 'none';
-    document.getElementById('loginForm').style.display = 'block';
-     // Hide other sections
-            document.getElementById('discussionPosts').style.display = 'none';
-            document.getElementById('bookingsDisplay').style.display = 'none';
-}
-
 </script>
 <script>
+  function loadAttendanceContent() {
+    // Load dynamic.html into the iframe
+    loadIframe('disattendance.html');
+  }
+  function loadFeedbackAndSurveysContent() {
+    // Load dynamic.html into the iframe
+    loadIframe('feeddetail.html');
+  }
+function loadvendorListContent() {
+  loadIframe('addvendors.html');
+}
+function loadEmployeeDirectoryContent() {
+  loadIframe('addemployee.html');
+}
+function loadLeaveManagementContent() {
+  loadIframe('displayleave.html');
+}
+</script>
+
+<script>
  function toggleSublinks(sublinksId) {
-    // Check if user is logged in
-    if (!isLoggedIn()) {
-        alert("Please login to access the page.");
+    // Check if user is logged in before allowing access to sublinks
+    if (!isLoggedIn) {
+        alert('Please login to access this page.'); // Show alert for unauthorized access
         return;
     }
 
@@ -650,13 +476,6 @@ function displayUserInfo() {
     // Show the clicked sublink list
     var sublinks = document.getElementById(sublinksId);
     sublinks.style.display = sublinks.style.display === 'none' ? 'block' : 'none';
-
-    // Show iframe container when sublinks are displayed
-    if (sublinks.style.display === 'block') {
-        document.getElementById('iframeWrapper').style.display = 'block';
-    } else {
-        document.getElementById('iframeWrapper').style.display = 'none';
-    }
 
     // If "Employees Induction" section is clicked, scroll to show its content
     if (sublinksId === 'employeesInduction') {
@@ -704,173 +523,17 @@ window.onload = adjustIframeHeight;
     document.getElementById('iframe').src = url;
   }
 
-  function toggleContent(content) {
-    // Add your logic to load the corresponding content in the iframe or content area
-    loadIframe(content + '.html');
-  }
-
-  function loadAttendanceContent() {
-    loadIframe('attendance.html');
-  }
-
-  function loadLeaveManagementContent() {
-    loadIframe('leave.html');
-  }
-
-  function loadEmployeeDirectoryContent() {
-    loadIframe('empdir.html');
-  }
-
-  function loadProjectWorkspaces() {
-    loadIframe('projectwork.html');
-  }
-
-  function loadTaskSystemContent() {
-    loadIframe('task.html');
-  }
-
-  function loadDocumentRepositoryContent() {
-    loadIframe('dir.html');
-  }
-
-  function loadITSupportPortalContent() {
-    loadIframe('officeIT.html');
-  }
-
-  function loadBookPage() {
-    loadIframe('book.html');
-  }
-
-  function loadFeedbackAndSurveysContent() {
-    loadIframe('feedback.html');
-  }
-
-  function loadBulletinBoardContent() {
-    loadIframe('bulletin.html');
-  }
-
-  function loadPositionsContent() {
-    loadIframe('position.html');
-  }
-
-  function loadQAJobsContent() {
-    loadIframe('Qa.html ');
-  }
-
-  function loadDevelopmentJobsContent() {
-    loadIframe('dev.html');
-  }
-
-  function loadWelcomeMessage() {
-    loadIframe('welcomemsg.html');
-  }
-
-  function loadOfficeLayout() {
-    loadIframe('officelayout.html');
-  }
-
-  function loadTeamIntroduction() {
-    loadIframe('teamintro.html');
-  }
-
-  function loadDosAndDontsContent() {
-    loadIframe('rules.html');
-  }
-
-  function loadQADEVContent() {
-    loadIframe('Qadev.html');
-  }
-
-  function loadCompanyOverview() {
-    loadIframe('cmpnyoverview.html');
-  }
-
-  function loadvendorListContent() {
-    loadIframe('vendor.html');
-  }
-</script>
-<script>
-function loadBookingDisplay() {
-  // Check if user is logged in
-  if (!isLoggedIn()) {
-        alert("Please login to access the page.");
-        return;
-    }
-
-  // Hide the iframe wrapper if it's visible
-  document.getElementById('iframeWrapper').style.display = 'none';
-
-  // Get today's date in 'yyyy-mm-dd' format
-  const today = new Date();
-  const formattedDate = today.toISOString().split('T')[0];
-
-  // Make AJAX request to fetch booking status for today
-  fetch(`http://192.168.0.121:3000/bookings/${formattedDate}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to fetch bookings');
-      }
-      return response.json();
-    })
-    .then(bookings => {
-      // Display bookings in a table
-      const bookingsDisplay = document.getElementById('bookingsDisplay');
-      bookingsDisplay.style.display = 'block'; // Make the bookingsDisplay visible
-
-      let html = `
-        <h2>Today's Booking Slots</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Room</th>
-              <th>Date</th>
-              <th>Time</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-
-      // Populate the table with booking data
-      bookings.forEach(booking => {
-        html += `
-          <tr>
-            <td>${booking.username}</td>
-            <td>${booking.room}</td>
-            <td>${formatDate(booking.date)}</td>
-            <td>${formatTime(booking.time)}</td>
-            <td>${booking.status === 1 ? 'Booked' : 'Available'}</td>
-          </tr>
-        `;
-      });
-
-      html += `
-          </tbody>
-        </table>
-      `;
-
-      // Update the bookingsDisplay section with the generated HTML
-      bookingsDisplay.innerHTML = html;
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Failed to load bookings');
-    });
+  function loadIframe(url) {
+  var iframe = document.getElementById('iframe');
+  iframe.onload = function() {
+    // Optional: Scroll the iframe container after loading the content
+    var sidebarHeight = document.querySelector('.sidebar').offsetHeight;
+    iframe.style.height = sidebarHeight + 'px';
+    iframe.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  iframe.src = url;
 }
-
-// Function to format date as 'yyyy-mm-dd'
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-GB');
-}
-
-// Function to format time as 'hh:mm'
-function formatTime(timeString) {
-  const time = new Date(`1970-01-01T${timeString}`);
-  return time.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-}
-
+// Function to fetch and display feedback data
 </script>
 
 </body>

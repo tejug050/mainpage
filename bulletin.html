@@ -1,0 +1,552 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discussion Forum</title>
+  <!-- jQuery CDN -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Font Awesome CDN -->
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css'>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      width: 80%;
+      max-width: 800px; /* Limit maximum width */
+      margin: 20px auto;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 20px; 
+    }
+      .container h1 {
+      text-align: center; /* Center align only the h1 text */
+    }
+    .post {
+      background: #fff;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .post__avatar, .comment-form__avatar, .comment__avatar {
+      width: 40px;
+      height: 40px;
+      background: #ccc;
+      border-radius: 50%;
+      margin-right: 10px;
+      display: inline-block;
+    }
+    .post__author {
+      display: inline-block;
+      margin: 0;
+      font-weight: bold;
+    }
+    .post__timestamp {
+      display: inline-block;
+      margin-left: 10px;
+      color: #777;
+    }
+    .post__body {
+      margin-top: 10px;
+    }
+    .comment-form textarea {
+      width: calc(100% - 50px);
+      height: 50px;
+      padding: 5px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      resize: none;
+    }
+    .button {
+      cursor: pointer;
+      display: inline-block;
+      margin-right: 10px;
+    }
+    .button--light {
+      background-color: #fff;
+      color: #3b5998;
+      border: 1px solid #3b5998;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+    .button--light:hover {
+      background-color: #f0f0f0;
+    }
+    .post__actions {
+      margin-top: 10px;
+    }
+    .post__likes {
+      color: #777;
+      margin-right: 10px;
+    }
+    .post__likes.active {
+      color: #3b5998;
+    }
+    .post__comments {
+      margin-top: 10px;
+    }
+    .comment {
+      background: #f9f9f9;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .comment__author {
+      font-weight: bold;
+      margin: 0;
+    }
+    .comment__timestamp {
+      color: #777;
+      margin-left: 10px;
+    }
+    .comment__body {
+      margin-top: 5px;
+    }
+    /* Scrollable container */
+    .scrollable-container {
+      max-height: 300px; /* Set a maximum height */
+      overflow-y: auto; /* Enable vertical scroll */
+      padding-right: 15px; /* Adjust for scrollbar width */
+    }
+    .post-form {
+      margin-top: 20px;
+    }
+    .post-form h2 {
+      margin-bottom: 10px;
+    }
+    .post-form input,
+    .post-form textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      resize: none;
+      box-sizing: border-box;
+    }
+    .post-form button {
+      background-color: #005f73;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .post-form button:hover {
+      background-color: #005f73;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Discussion Forum</h1>
+  <div class="scrollable-container">
+    <div id="discussionPosts">
+      <!-- Discussion posts will be added dynamically here -->
+    </div>
+  </div>
+  <div class="post-form">
+    <h2>Add a New Post</h2>
+    <input type="text" id="author" placeholder="Your Name"><br>
+    <textarea id="body" placeholder="Write your post..." rows="2"></textarea><br>
+    <button id="addPost">Add Post</button>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+    // Function to add discussion posts dynamically
+    function addDiscussionPosts(posts) {
+      var container = $("#discussionPosts");
+      container.empty(); // Clear previous posts
+
+      posts.forEach(function(post) {
+        var postHTML = createPostHTML(post);
+        container.append(postHTML);
+        loadComments(post.id);
+      });
+    }
+
+    function addNewPost(author, body) {
+  $.ajax({
+    type: 'POST',
+    url: 'http://192.168.0.121:3000/api/posts',
+    contentType: 'application/json',
+    data: JSON.stringify({ author: author, body: body }), // Ensure author and body are correctly sent
+    success: function(response) {
+      $('#author').val('');
+      $('#body').val('');
+       $('#discussionPosts').prepend(createPostHTML(response));
+           // Scroll to the top of the page
+      $('html, body').animate({ scrollTop: 0 }, 'fast');
+    },
+    error: function(err) {
+      console.error('Error adding new post:', err);
+    }
+  });
+}
+
+
+    // Function to load comments for a post
+    function loadComments(postId) {
+      $.ajax({
+        type: 'GET',
+        url: 'http://192.168.0.121:3000/api/comments/' + postId,
+        success: function(comments) {
+          var post = $('#post-' + postId);
+          var commentsContainer = post.find('.post__comments');
+          commentsContainer.empty(); // Clear previous comments
+          comments.forEach(function(comment) {
+            var commentHTML = createCommentHTML(comment);
+            commentsContainer.append(commentHTML);
+          });
+        },
+        error: function(err) {
+          console.error('Error fetching comments:', err);
+        }
+      });
+    }
+
+    // Event listener to add a new post
+    $('#addPost').on('click', function() {
+      var author = $('#author').val().trim();
+      var body = $('#body').val().trim();
+
+      if (author !== "" && body !== "") {
+        addNewPost(author, body);
+      } else {
+        alert('Please fill out all fields.');
+      }
+    });
+
+    // Event listener to toggle comment form
+    $(document).on("click", ".comment-trigger", function() {
+      var post = $(this).closest(".post");
+      post.find(".comment-form").slideToggle();
+      post.find(".comment-textarea").focus();
+    });
+
+    // Event listener to cancel comment
+    $(document).on("click", ".cancel", function() {
+      $(this).closest(".comment-form").slideUp();
+      $(this).closest(".post").find(".comment-textarea").val("");
+    });
+
+    // Event listener to confirm comment
+    $(document).on("click", ".button--confirm", function() {
+      var post = $(this).closest(".post");
+      var commentText = post.find(".comment-textarea").val().trim();
+      var postId = post.attr("id").split("-")[1]; // Extract post ID
+
+      if (commentText !== "") {
+        $.ajax({
+          type: 'POST',
+          url: 'http://192.168.0.121:3000/api/comments',
+          contentType: 'application/json',
+          data: JSON.stringify({ post_id: postId, author: "You", body: commentText }),
+          success: function(response) {
+            post.find(".post__comments").append(createCommentHTML(response));
+            post.find(".comment-form").slideUp();
+            post.find(".comment-textarea").val('');
+            updateScroll(); // Update scroll after adding new comment
+          },
+          error: function(err) {
+            console.error('Error adding new comment:', err);
+          }
+        });
+        } else {
+        alert('Please enter your comment.');
+      }
+    });
+
+    // Event listener to toggle like
+    $(document).on("click", ".like-trigger", function() {
+      var post = $(this).closest(".post");
+      var liked = post.data("liked");
+      var likes = post.data("likes");
+      var postId = post.attr("id").split("-")[1]; // Extract post ID
+
+      if (!liked) {
+        likes++;
+        post.data("liked", true);
+        post.data("likes", likes);
+        post.find(".post__likes").addClass("active").text(likes === 1 ? "1 Like" : likes + " Likes");
+      } else {
+        likes--;
+        post.data("liked", false);
+        post.data("likes", likes);
+        post.find(".post__likes").removeClass("active").text(likes === 1 ? "1 Like" : likes + " Likes");
+      }
+    });
+
+   // Helper function to create post HTML
+function createPostHTML(post) {
+  // Convert timestamp to a JavaScript Date object
+  var timestamp = new Date(post.timestamp);
+
+  // Format the date as desired (e.g., "DD/MM/YYYY HH:MM:SS")
+  var formattedDate = timestamp.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+
+  return `
+    <div class="post" id="post-${post.id}" data-liked="${post.liked}" data-likes="${post.likes}">
+      <div class="post__avatar"></div>
+      <h4 class="post__author">${post.author}</h4>
+      <h5 class="post__timestamp">${formattedDate}</h5>
+      <p class="post__body">${post.body}</p>
+      <div class="post__actions">
+        <div class="button button--light like-trigger">
+          <i class="fa fa-thumbs-o-up"></i> <span class="post__likes">${post.likes === 1 ? "1 Like" : post.likes + " Likes"}</span>
+        </div>
+        <div class="button button--light comment-trigger">
+          <i class="fa fa-comment-o"></i> Comment
+        </div>
+      </div>
+      <div class="comment-form" style="display:none;">
+        <textarea class="comment-textarea" placeholder="Write a comment..." rows="2"></textarea>
+        <br>
+        <button class="button button--light button--confirm">Confirm</button>
+        <button class="button button--light cancel">Cancel</button>
+      </div>
+      <div class="post__comments">
+        <!-- Comments will be added dynamically here -->
+      </div>
+    </div>
+  `;
+}
+
+    // Helper function to create comment HTML
+function createCommentHTML(comment) {
+  // Convert timestamp to a JavaScript Date object
+  var timestamp = new Date(comment.timestamp);
+
+  // Format the date as desired (e.g., "DD/MM/YYYY HH:mm:ss")
+  var formattedDate = timestamp.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+
+  return `
+    <div class="comment">
+      <h5 class="comment__author">${comment.author}</h5>
+      <p class="comment__body">${comment.body}</p>
+      <h6 class="comment__timestamp">${formattedDate}</h6>
+    </div>
+  `;
+}
+
+
+   // Function to update scroll
+  function updateScroll() {
+    var element = document.getElementById("discussionPosts");
+    element.scrollTop = element.scrollHeight;
+  }
+
+  // Function to scroll to the new post
+  function scrollToNewPost(postId) {
+    var newPost = $("#post-" + postId);
+    $('html, body').animate({
+      scrollTop: newPost.offset().top
+    }, 800);
+  }
+ // Function to fetch and display all posts
+    function fetchAndDisplayPosts() {
+      $.ajax({
+        type: 'GET',
+        url: 'http://192.168.0.121:3000/api/posts',
+        success: function(posts) {
+          addDiscussionPosts(posts);
+          updateScroll(); // Update scroll after fetching posts
+        },
+        error: function(err) {
+          console.error('Error fetching posts:', err);
+        }
+      });
+    }
+function createCommentHTML(comment) {
+  // Convert timestamp to a JavaScript Date object
+  var timestamp = new Date(comment.timestamp);
+
+  // Format the date as desired (e.g., "DD/MM/YYYY HH:mm:ss")
+  var formattedDate = timestamp.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+
+  return `
+    <div class="comment" id="comment-${comment.id}">
+      <h5 class="comment__author">${comment.author}</h5>
+      <p class="comment__body">${comment.body}</p>
+      <h6 class="comment__timestamp">${formattedDate}</h6>
+      <div class="comment__actions">
+        <button class="button button--light delete-comment" data-comment-id="${comment.id}">
+          <i class="fa fa-trash"></i> Delete
+        </button>
+        <button class="button button--light edit-comment" data-comment-id="${comment.id}">
+          <i class="fa fa-pencil"></i> Edit
+        </button>
+      </div>
+    </div>
+  `;
+}
+// Event listener to delete comment
+$(document).on("click", ".delete-comment", function() {
+  var commentId = $(this).data("comment-id");
+
+  if (confirm("Are you sure you want to delete this comment?")) {
+    $.ajax({
+      type: 'DELETE',
+      url: `http://192.168.0.121:3000/api/comments/${commentId}`,
+      success: function(response) {
+        $(`#comment-${commentId}`).remove();
+        console.log("Comment deleted successfully");
+      },
+      error: function(err) {
+        console.error('Error deleting comment:', err);
+      }
+    });
+  }
+});
+// Event listener to edit comment
+$(document).on("click", ".edit-comment", function() {
+  var commentId = $(this).data("comment-id");
+  var newBody = prompt("Edit your comment:");
+
+  if (newBody !== null && newBody.trim() !== "") {
+    $.ajax({
+      type: 'PUT',
+      url: `http://192.168.0.121:3000/api/comments/${commentId}`,
+      contentType: 'application/json',
+      data: JSON.stringify({ body: newBody }),
+      success: function(response) {
+        $(`#comment-${commentId} .comment__body`).text(newBody);
+        console.log("Comment updated successfully");
+      },
+      error: function(err) {
+        console.error('Error updating comment:', err);
+      }
+    });
+  }
+});
+// Helper function to create post HTML
+function createPostHTML(post) {
+  // Convert timestamp to a JavaScript Date object
+  var timestamp = new Date(post.timestamp);
+
+  // Format the date as desired (e.g., "DD/MM/YYYY HH:MM:SS")
+  var formattedDate = timestamp.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+
+  return `
+    <div class="post" id="post-${post.id}" data-liked="${post.liked}" data-likes="${post.likes}">
+      <div class="post__avatar"></div>
+      <h4 class="post__author">${post.author}</h4>
+      <h5 class="post__timestamp">${formattedDate}</h5>
+      <p class="post__body">${post.body}</p>
+      <div class="post__actions">
+        <div class="button button--light like-trigger">
+          <i class="fa fa-thumbs-o-up"></i> <span class="post__likes">${post.likes === 1 ? "1 Like" : post.likes + " Likes"}</span>
+        </div>
+        <div class="button button--light comment-trigger">
+          <i class="fa fa-comment-o"></i> Comment
+        </div>
+<!--        <div class="button button--light edit-post" data-post-id="${post.id}">
+          <i class="fa fa-pencil"></i> Edit
+        </div>-->
+        <div class="button button--light delete-post" data-post-id="${post.id}">
+          <i class="fa fa-trash"></i> Delete
+        </div>
+      </div>
+      <div class="comment-form" style="display:none;">
+        <textarea class="comment-textarea" placeholder="Write a comment..." rows="2"></textarea>
+        <br>
+        <button class="button button--light button--confirm">Confirm</button>
+        <button class="button button--light cancel">Cancel</button>
+      </div>
+      <div class="post__comments">
+        <!-- Comments will be added dynamically here -->
+      </div>
+    </div>
+  `;
+}
+
+// Event listener to delete post
+$(document).on("click", ".delete-post", function() {
+  var postId = $(this).data("post-id");
+
+  if (confirm("Are you sure you want to delete this post?")) {
+    $.ajax({
+      type: 'DELETE',
+      url: `http://192.168.0.121:3000/api/posts/${postId}`,
+      success: function(response) {
+        $(`#post-${postId}`).remove();
+        console.log("Post deleted successfully");
+      },
+      error: function(err) {
+        console.error('Error deleting post:', err);
+      }
+    });
+  }
+});
+
+// Event listener to edit post
+//$(document).on("click", ".edit-post", function() {
+  //var postId = $(this).data("post-id");
+//  var newBody = prompt("Edit your post:");
+
+//  if (newBody !== null && newBody.trim() !== "") {
+  //  $.ajax({
+//      type: 'PUT',
+//      url: `http://192.168.0.121:3000/api/posts/${postId}`,
+//      contentType: 'application/json',
+//      data: JSON.stringify({ body: newBody }),
+//      success: function(response) {
+//        $(`#post-${postId} .post__body`).text(newBody);
+//        console.log("Post updated successfully");
+//      },
+//      error: function(err) {
+//        console.error('Error updating post:', err);
+//      }
+//    });
+//  }
+//});
+
+    // Load posts on page load
+    fetchAndDisplayPosts();
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,285 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Directory</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .container {
+            width: 70%;
+            margin: 0 auto;
+        }
+
+        .form-container {
+            text-align: center;
+            margin: 20px;
+        }
+
+        .form-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: green;
+            color: white;
+            border: none;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .edit-input {
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search-container input {
+            width: 50%;
+            padding: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Employee Directory</h1>
+    <div class="container">
+        <div class="form-container">
+            <button onclick="addEmployeeRow()">Add Employee</button>
+        </div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search by name..." onkeyup="searchEmployees()">
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Serial No</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Contact</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="employee-list">
+                <!-- Employees will be loaded here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Function to load employees on page load
+async function loadEmployees() {
+    try {
+        const response = await fetch('http://192.168.0.121:3000/api/employees');
+        const employees = await response.json();
+
+        const employeeList = document.getElementById('employee-list');
+        employeeList.innerHTML = '';
+
+        employees.forEach((employee, index) => {
+            const row = `<tr id="employee-${employee.id}">
+                <td>${index + 1}</td>
+                <td>${employee.name}</td>
+                <td>${employee.department}</td>
+                <td>${employee.contact}</td>
+                <td><button onclick="editEmployee(${employee.id})">Edit</button></td>
+            </tr>`;
+            employeeList.innerHTML += row;
+        });
+
+    } catch (error) {
+        console.error('Error loading employees:', error.message);
+    }
+}
+
+// Function to edit an employee
+async function editEmployee(employeeId) {
+    try {
+        // Fetch employee details
+        const response = await fetch(`http://192.168.0.121:3000/api/employees/${employeeId}`);
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch employee');
+        }
+
+        const employee = await response.json();
+
+        // Replace row with input fields for editing
+        const row = document.getElementById(`employee-${employeeId}`);
+        row.innerHTML = `<td>${employeeId}</td>
+            <td><input type="text" class="edit-input" value="${employee.name}" id="editEmployeeName${employeeId}"></td>
+            <td><input type="text" class="edit-input" value="${employee.department}" id="editDepartment${employeeId}"></td>
+            <td><input type="text" class="edit-input" value="${employee.contact}" id="editContact${employeeId}"></td>
+            <td><button onclick="submitEmployeeEdit(${employeeId})">Save</button></td>`;
+    } catch (error) {
+        console.error('Error editing employee:', error.message);
+        alert('Failed to edit employee');
+    }
+}
+
+// Function to submit employee edits
+async function submitEmployeeEdit(employeeId) {
+    try {
+        // Get edited values
+        const editedEmployeeName = document.getElementById(`editEmployeeName${employeeId}`).value;
+        const editedDepartment = document.getElementById(`editDepartment${employeeId}`).value;
+        const editedContact = document.getElementById(`editContact${employeeId}`).value;
+
+        // Send edited data to server
+        const response = await fetch(`http://192.168.0.121:3000/api/employees/${employeeId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: editedEmployeeName,
+                department: editedDepartment,
+                contact: editedContact
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update employee');
+        }
+
+        // Reload employees after update
+        loadEmployees();
+    } catch (error) {
+        console.error('Error updating employee:', error.message);
+        alert('Failed to update employee');
+    }
+}
+
+// Function to dynamically add a new employee row
+function addEmployeeRow() {
+    const table = document.getElementById('employee-list');
+    const rowCount = table.rows.length;
+    const row = table.insertRow(rowCount);
+
+    const cell1 = row.insertCell(0);
+    const cell2 = row.insertCell(1);
+    const cell3 = row.insertCell(2);
+    const cell4 = row.insertCell(3);
+    const cell5 = row.insertCell(4);
+
+    cell1.innerHTML = rowCount + 1;
+    cell2.innerHTML = `<input type="text" class="edit-input" id="newEmployeeName${rowCount + 1}" placeholder="Name">`;
+    cell3.innerHTML = `<input type="text" class="edit-input" id="newDepartment${rowCount + 1}" placeholder="Department">`;
+    cell4.innerHTML = `<input type="text" class="edit-input" id="newContact${rowCount + 1}" placeholder="Contact">`;
+    cell5.innerHTML = '<button onclick="submitNewEmployee(this)">Submit</button>';
+}
+
+// Function to submit a new employee
+async function submitNewEmployee(button) {
+    const row = button.parentNode.parentNode;
+    const newEmployeeName = document.getElementById(`newEmployeeName${row.rowIndex}`).value;
+    const newDepartment = document.getElementById(`newDepartment${row.rowIndex}`).value;
+    const newContact = document.getElementById(`newContact${row.rowIndex}`).value;
+
+    if (newEmployeeName && newDepartment && newContact) {
+        try {
+            const response = await fetch('http://192.168.0.121:3000/api/employees', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: newEmployeeName,
+                    department: newDepartment,
+                    contact: newContact
+                }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const employeeList = document.getElementById('employee-list');
+                const newRow = `<tr id="employee-${data.id}">
+                    <td>${data.id}</td>
+                    <td>${newEmployeeName}</td>
+                    <td>${newDepartment}</td>
+                    <td>${newContact}</td>
+                    <td><button onclick="editEmployee(${data.id})">Edit</button></td>
+                </tr>`;
+                employeeList.insertAdjacentHTML('beforeend', newRow);
+
+                // Clear input fields after adding
+                document.getElementById(`newEmployeeName${row.rowIndex}`).value = '';
+                document.getElementById(`newDepartment${row.rowIndex}`).value = '';
+                document.getElementById(`newContact${row.rowIndex}`).value = '';
+            } else {
+                throw new Error('Failed to add employee');
+            }
+        } catch (error) {
+            console.error('Error adding employee:', error.message);
+            alert('Failed to add employee');
+        }
+    } else {
+        alert('Please fill in all fields');
+    }
+}
+
+// Function to search employees
+function searchEmployees() {
+    const input = document.getElementById('searchInput').value.toUpperCase();
+    const table = document.getElementById('employee-list');
+    const rows = table.getElementsByTagName('tr');
+
+    for (let i = 0; i < rows.length; i++) {
+        const tdName = rows[i].getElementsByTagName('td')[1];
+        const tdDepartment = rows[i].getElementsByTagName('td')[2];
+        const tdContact = rows[i].getElementsByTagName('td')[3];
+
+        if (tdName || tdDepartment || tdContact) {
+            const txtValueName = tdName.textContent || tdName.innerText;
+            const txtValueDepartment = tdDepartment.textContent || tdDepartment.innerText;
+            const txtValueContact = tdContact.textContent || tdContact.innerText;
+
+            if (txtValueName.toUpperCase().indexOf(input) > -1 ||
+                txtValueDepartment.toUpperCase().indexOf(input) > -1 ||
+                txtValueContact.toUpperCase().indexOf(input) > -1) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    }
+}
+
+// Load employees on page load
+loadEmployees();
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        select {
+            width: 100%;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #ddd;
+        }
+        .highlight {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Leave Details</h1>
+        <label for="employeeSelect">Select Employee:</label>
+        <select id="employeeSelect" onchange="fetchAndDisplayLeaveDetails()">
+            <option value="">Select an employee</option>
+            <!-- Options will be dynamically added here -->
+        </select>
+
+        <label for="monthSelect">Select Month:</label>
+        <select id="monthSelect" onchange="fetchAndDisplayLeaveDetails()">
+            <option value="0">All Months</option>
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+        </select>
+
+        <table id="leaveDetailsTable" style="display:none;">
+            <thead>
+                <tr>
+                    <th colspan="4" id="monthHeader" class="highlight">Leave Details</th>
+                </tr>
+                <tr>
+                    <th>Reason</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Number of Days</th>
+                </tr>
+            </thead>
+            <tbody id="leaveDetailsTableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        function fetchAndDisplayLeaveDetails() {
+            const employeeName = document.getElementById('employeeSelect').value;
+            const selectedMonth = document.getElementById('monthSelect').value;
+
+            if (employeeName) {
+                fetch(`http://192.168.0.121:3000/fetchLeaveRequests/${employeeName}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (selectedMonth === '0') {
+                            // Display all months
+                            populateLeaveDetails(data);
+                        } else {
+                            // Filter leave requests for the selected month
+                            const filteredData = data.filter(request => {
+                                const startDate = new Date(request.startDate);
+                                return startDate.getMonth() + 1 === parseInt(selectedMonth);
+                            });
+                            populateLeaveDetails(filteredData);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching leave requests:', error);
+                    });
+            } else {
+                clearLeaveDetails();
+            }
+        }
+
+        function populateLeaveDetails(data) {
+            const leaveDetailsTableBody = document.getElementById('leaveDetailsTableBody');
+            leaveDetailsTableBody.innerHTML = ''; // Clear previous data
+
+            let totalDays = 0;
+
+            data.forEach(request => {
+                const startDate = new Date(request.startDate);
+                const endDate = new Date(request.endDate);
+                const numberOfDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1; // Calculate number of days
+                totalDays += numberOfDays;
+
+                const startDateFormatted = startDate.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: '2-digit'
+                });
+                const endDateFormatted = endDate.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: '2-digit'
+                });
+
+                const row = `<tr>
+                                <td>${request.reason}</td>
+                                <td>${startDateFormatted}</td>
+                                <td>${endDateFormatted}</td>
+                                <td>${numberOfDays}</td>
+                            </tr>`;
+                leaveDetailsTableBody.insertAdjacentHTML('beforeend', row);
+            });
+
+            document.getElementById('leaveDetailsTable').style.display = 'table';
+
+            // Update the table header with total days
+            const monthName = document.getElementById('monthSelect').options[document.getElementById('monthSelect').selectedIndex].text;
+            document.getElementById('monthHeader').innerText = `Total Number of Holidays for ${monthName}: ${totalDays}`;
+        }
+
+        function clearLeaveDetails() {
+            document.getElementById('leaveDetailsTableBody').innerHTML = '';
+            document.getElementById('leaveDetailsTable').style.display = 'none';
+        }
+
+        window.onload = function() {
+            fetchEmployeeNames();
+        };
+
+        function fetchEmployeeNames() {
+            fetch('http://192.168.0.121:3000/employeeNames')
+                .then(response => response.json())
+                .then(names => {
+                    const selectElement = document.getElementById('employeeSelect');
+                    selectElement.innerHTML = '<option value="">Select an employee</option>';
+
+                    names.forEach(name => {
+                        selectElement.innerHTML += `<option value="${name.employeeName}">${name.employeeName}</option>`;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching employee names:', error);
+                });
+        }
+    </script>
+</body>
+</html>

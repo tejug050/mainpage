@@ -1,0 +1,449 @@
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Office Attendance System</title>
+   <style>
+    /* General Styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 5px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #007bff; /* Blue color */
+    }
+    h2 {
+      margin-top: 20px;
+    }
+    .attendance-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .attendance-info p {
+      margin: 0;
+      font-weight: bold;
+    }
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .buttons button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .buttons button:hover {
+      background-color: #0056b3;
+    }
+    .attendance-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    .attendance-table th, .attendance-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    .attendance-table th {
+      background-color: #007bff;
+      color: white;
+    }
+    .attendance-table td {
+      background-color: #f2f2f2;
+    }
+    .message-input {
+      margin-bottom: 20px;
+    }
+    .message-input input {
+      padding: 10px;
+      width: calc(100% - 80px); /* Adjust for button width and padding */
+      max-width: 600px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .message-input button {
+      width: 80px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .message-input button:hover {
+      background-color: #0056b3;
+    }
+    .total-hours {
+      font-weight: bold;
+      margin-top: 20px;
+      text-align: center;
+    }
+    #fetchDataBtn {
+      background-color: #dc3545; /* Red color */
+    }
+    /* Hover style for the Fetch Attendance Data button */
+    #fetchDataBtn:hover {
+      background-color: #c82333; /* Darker red color on hover */
+    }
+  </style>
+</head>
+<body>
+    <div class="container">
+  <h1>Attendance Tracking</h1>
+        <div id="userSection" style="display: none;"><br>
+            <div class="user-profile"><br>
+                <span id="welcomeMessage" style="font-weight: bold;"></span>
+            </div>
+        </div>
+        <div class="attendance-info">
+            <p>Login Time: <span id="login-time">Not logged in</span></p>
+            <p>Logout Time: <span id="logout-time">Not logged out</span></p>
+        </div>
+        <div class="buttons">
+            <button id="login-btn">Login</button>
+            <button id="logout-btn">Logout</button>
+            <button id="submit-btn">Submit</button>
+        </div>
+        <div class="message-input" style="display: none;">
+            <textarea id="message" rows="3" placeholder="Reason for early leaving"></textarea>
+        </div>
+        <h2>Fetch Attendance Data</h2>
+        <div>
+            <label for="attendanceDate">Select Date: </label>
+            <input type="date" id="attendanceDate">
+            <button type="button" id="fetchDataBtn">Fetch Attendance Data</button>
+        </div>
+        <table class="attendance-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Day</th>
+                    <th>Login Time</th>
+                    <th>Logout Time</th>
+                    <th>Worked Hours</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="sunday-date">-</td>
+                    <td id="sunday-day">Sunday</td>
+                    <td id="sunday-login">-</td>
+                    <td id="sunday-logout">-</td>
+                    <td id="sunday-hours">-</td>
+                    <td id="sunday-message">-</td>
+                </tr>
+                <tr>
+                    <td id="monday-date">-</td>
+                    <td id="monday-day">Monday</td>
+                    <td id="monday-login">-</td>
+                    <td id="monday-logout">-</td>
+                    <td id="monday-hours">-</td>
+                    <td id="monday-message">-</td>
+                </tr>
+                <tr>
+                    <td id="tuesday-date">-</td>
+                    <td id="tuesday-day">Tuesday</td>
+                    <td id="tuesday-login">-</td>
+                    <td id="tuesday-logout">-</td>
+                    <td id="tuesday-hours">-</td>
+                    <td id="tuesday-message">-</td>
+                </tr>
+                <tr>
+                    <td id="wednesday-date">-</td>
+                    <td id="wednesday-day">Wednesday</td>
+                    <td id="wednesday-login">-</td>
+                    <td id="wednesday-logout">-</td>
+                    <td id="wednesday-hours">-</td>
+                    <td id="wednesday-message">-</td>
+                </tr>
+                <tr>
+                    <td id="thursday-date">-</td>
+                    <td id="thursday-day">Thursday</td>
+                    <td id="thursday-login">-</td>
+                    <td id="thursday-logout">-</td>
+                    <td id="thursday-hours">-</td>
+                    <td id="thursday-message">-</td>
+                </tr>
+                <tr>
+                    <td id="friday-date">-</td>
+                    <td id="friday-day">Friday</td>
+                    <td id="friday-login">-</td>
+                    <td id="friday-logout">-</td>
+                    <td id="friday-hours">-</td>
+                    <td id="friday-message">-</td>
+                </tr>
+                <tr>
+                    <td id="saturday-date">-</td>
+                    <td id="saturday-day">Saturday</td>
+                    <td id="saturday-login">-</td>
+                    <td id="saturday-logout">-</td>
+                    <td id="saturday-hours">-</td>
+                    <td id="saturday-message">-</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="total-hours">
+            Total Monthly Hours: <span id="total-hours-month">-</span>
+        </div>
+    </div>
+    <script>
+        let username; // Define username variable globally
+
+         window.addEventListener('DOMContentLoaded', (event) => {
+        username = localStorage.getItem('username');
+          const storedLoginTime = localStorage.getItem('loginTime');
+        if (username) {
+            document.getElementById('welcomeMessage').textContent = `Welcome, ${username}!`;
+            document.getElementById('userSection').style.display = 'block';
+            
+            if (storedLoginTime) {
+            document.getElementById('login-time').textContent = new Date(storedLoginTime).toLocaleTimeString();
+            document.getElementById('login-btn').style.filter = 'blur(2px)';
+            document.getElementById('login-btn').disabled = true;            }
+        }
+        // Fetch all attendance records when the page loads
+        fetchAttendanceRecords();
+    });
+        
+
+        const monthlyHours = {
+            sunday: 0,
+            monday: 0,
+            tuesday: 0,
+            wednesday: 0,
+            thursday: 0,
+            friday: 0,
+            saturday: 0
+        };
+
+      document.getElementById('login-btn').addEventListener('click', function () {
+    const loginTime = new Date();
+    const loginTime12hr = convertTo12hrFormat(loginTime);
+
+    document.getElementById('login-time').textContent = loginTime12hr;
+    localStorage.setItem('loginTime', loginTime); // Store the login time as a Date object
+    const day = loginTime.toLocaleString('en-US', { weekday: 'long' }).toLowerCase();
+    const date = loginTime.toLocaleDateString();
+    document.getElementById(`${day}-login`).textContent = loginTime12hr;
+    document.getElementById(`${day}-date`).textContent = date;
+    document.getElementById('login-time').dataset.time = loginTime.toISOString(); // Store ISO string for potential backend use
+
+    // Disable the login button and apply blur effect
+    this.disabled = true;
+    this.style.filter = 'blur(2px)';
+});
+
+
+document.getElementById('logout-btn').addEventListener('click', function() {
+    const logoutTime = new Date();
+    const currentHour = logoutTime.getHours();
+    const currentMinute = logoutTime.getMinutes();
+
+    // Check if logout is before 6:00 PM
+    if (currentHour < 18 || (currentHour === 18 && currentMinute < 0)) {
+        // Prompt for reason
+        const reason = prompt("Please provide a reason for early leaving:");
+        if (reason !== null && reason.trim() !== '') {
+            document.getElementById('message').value = reason;
+        } else {
+            return; // Do not proceed if reason is not provided
+        }
+    } else {
+        // Clear any previous reason
+        document.getElementById('message').value = '';
+    }
+
+    // Adjust logout time to 6:00 PM if it's before that
+    if (currentHour < 18 || (currentHour === 18 && currentMinute < 0)) {
+        logoutTime.setHours(18, 0, 0); // Set logout time to 6:00 PM
+    }
+
+    // Convert to 12-hour format
+    const logoutTime12hr = convertTo12hrFormat(logoutTime);
+
+    // Update logout time display
+    document.getElementById('logout-time').textContent = logoutTime12hr;
+    const day = logoutTime.toLocaleString('en-US', { weekday: 'long' }).toLowerCase();
+    document.getElementById(`${day}-logout`).textContent = logoutTime12hr;
+    document.getElementById('logout-time').dataset.time = logoutTime.toISOString(); // Store ISO string
+});
+
+function convertTo12hrFormat(time) {
+    let hours = time.getHours();
+    const minutes = time.getMinutes();
+    const period = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+
+    const formattedTime = `${hours}:${minutes.toString().padStart(2, '0')} ${period}`;
+    return formattedTime;
+}
+
+function toIST(date) {
+    const offset = 5.5 * 60; // IST offset in minutes
+    const istDate = new Date(date.getTime() + (offset * 60 * 1000));
+    return istDate;
+}
+
+function formatDate(date) {
+    const d = new Date(date);
+    const month = '' + (d.getMonth() + 1);
+    const day = '' + d.getDate();
+    const year = d.getFullYear();
+
+    return [year, month.padStart(2, '0'), day.padStart(2, '0')].join('-');
+}
+
+
+       // Submit button event listener
+       document.getElementById('submit-btn').addEventListener('click', async function() {
+    const loginTime = toIST(new Date(localStorage.getItem('loginTime')));
+    const logoutTime = toIST(new Date(document.getElementById('logout-time').dataset.time));
+    const message = document.getElementById('message').value;
+
+    if (!isNaN(loginTime) && !isNaN(logoutTime)) {
+        const totalMilliseconds = logoutTime - loginTime;
+        const totalHours = (totalMilliseconds / (1000 * 60 * 60)).toFixed(2);
+        const day = new Date().toLocaleString('en-US', { weekday: 'long' }).toLowerCase();
+        const date = formatDate(loginTime); // Use the formatted date
+
+        document.getElementById(`${day}-hours`).textContent = totalHours;
+        document.getElementById(`${day}-message`).textContent = message;
+
+        // Save to server
+        const data = {
+            username: username, // Use the global username variable
+            date: date, // Use the formatted date
+            day: day,
+            loginTime: loginTime.toISOString(), // Ensure ISO string format
+            logoutTime: logoutTime.toISOString(), // Ensure ISO string format
+            workedHours: parseFloat(totalHours),
+            reason: message
+        };
+
+        try {
+            const response = await fetch('http://192.168.0.121:3000/attendance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            const result = await response.text();
+            console.log(result);
+              // Clear login time from localStorage
+            localStorage.removeItem('loginTime');
+             // Re-enable the login button and remove the blur effect
+            document.getElementById('login-btn').disabled = false;
+            document.getElementById('login-btn').style.filter = 'none';
+        } catch (error) {
+            console.error('Error saving attendance:', error);
+            alert('Error saving attendance record.');
+        }
+
+        document.getElementById('message').value = ''; // Clear the message input
+       
+    } else {
+        alert("Please log in and log out first.");
+    }
+});
+
+
+async function fetchAttendanceRecords() {
+    const selectedDate = document.getElementById('attendanceDate').value;
+    const username = localStorage.getItem('username');
+
+    if (!username) {
+        alert("Username not found. Please log in again.");
+        return;
+    }
+
+    const url = selectedDate ?
+        `http://192.168.0.121:3000/attendance?date=${selectedDate}&username=${username}` :
+        `http://192.168.0.121:3000/attendance?username=${username}`;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Error fetching attendance records.');
+        }
+        const data = await response.json();
+
+        // Clear previous table data
+        document.querySelectorAll('.attendance-table td').forEach(td => {
+            td.textContent = '-';
+        });
+
+        // Initialize total monthly hours
+        let totalMonthlyHours = 0;
+
+        // Loop through each record and update the corresponding table cell
+        data.forEach(record => {
+            const day = new Date(record.date).toLocaleString('en-US', { weekday: 'long' }).toLowerCase();
+
+            // Format the date
+            const formattedDate = new Date(record.date).toLocaleDateString();
+
+            document.getElementById(`${day}-date`).textContent = formattedDate;
+            document.getElementById(`${day}-day`).textContent = day.charAt(0).toUpperCase() + day.slice(1); // Capitalize day
+            document.getElementById(`${day}-login`).textContent = record.login_time;
+            document.getElementById(`${day}-logout`).textContent = record.logout_time;
+
+            // Convert decimal hours to hh:mm:ss format
+            const decimalHours = parseFloat(record.worked_hours);
+            const hours = Math.floor(decimalHours);
+            const minutes = Math.floor((decimalHours - hours) * 60);
+            const seconds = Math.floor(((decimalHours - hours) * 60 - minutes) * 60);
+            const formattedHours = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById(`${day}-hours`).textContent = formattedHours;
+
+            document.getElementById(`${day}-message`).textContent = record.reason;
+
+            // Update the total monthly hours
+            totalMonthlyHours += decimalHours;
+        });
+
+        // Display total monthly hours
+        const totalHours = Math.floor(totalMonthlyHours);
+        const totalMinutes = Math.floor((totalMonthlyHours - totalHours) * 60);
+        const totalSeconds = Math.floor(((totalMonthlyHours - totalHours) * 60 - totalMinutes) * 60);
+        const formattedTotalHours = `${totalHours.toString().padStart(2, '0')}:${totalMinutes.toString().padStart(2, '0')}:${totalSeconds.toString().padStart(2, '0')}`;
+        document.getElementById('total-hours-month').textContent = formattedTotalHours;
+
+    } catch (error) {
+        console.error('Error fetching attendance records:', error);
+        alert('Error fetching attendance records.');
+    }
+}
+
+document.getElementById('fetchDataBtn').addEventListener('click', fetchAttendanceRecords);
+    </script>
+</body>
+</html>

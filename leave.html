@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Management</title>
+    <style>
+        /* Your existing CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            margin-top: 10px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h3 {
+            display: inline;
+            color: black;
+        }
+        .section p {
+            display: inline;
+            color: black;
+            margin-left: 5px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .leave-form {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .leave-form input[type="text"],
+        .leave-form input[type="date"],
+        .leave-form textarea {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .leave-form textarea {
+            height: 100px;
+        }
+        .leave-form .btn {
+            margin-top: 0;
+        }
+        .leave-form .btn-cancel {
+            background-color: #dc3545;
+            margin-right: 10px;
+        }
+        .leave-form .btn-sheet {
+            background-color: #28a745;
+        }
+        /* Flexbox styles */
+        .input-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .input-container label {
+            flex: 1;
+            margin-right: 10px;
+        }
+        .input-container input {
+            flex: 2;
+        }
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #ddd;
+        }
+        .input-container-row {
+            display: flex;
+            justify-content: space-between;
+        }
+        .input-container-row .input-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-right: 10px;
+        }
+        .input-container-row .input-container:last-child {
+            margin-right: 0; /* Remove right margin for the last input container */
+        }
+        .alert {
+    text-align: center;
+    background-color: green; /* Green background color */
+    font-weight: bold; /* Bold font weight */
+    color: white; /* White text color */
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    display: none; /* Initially hidden */
+}
+#currentDate {
+            text-align: right;
+            font-size: 14px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+    
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Leave Management</h1><br>
+        <div id="currentDate"></div><br>
+        <div class="section">
+            <h3>Leave Policy</h3>
+            <p>Content about the leave policy goes here.</p>
+        </div>
+        <div class="section">
+            <h3>Leave Balance</h3>
+            <div id="userSection" style="display: none;"><br>
+                <div class="user-profile"><br>
+                    <span id="welcomeMessage" style="font-weight: bold;"></span>    
+                </div>
+            </div>
+            <table>
+                <tr>
+                    <th>Total Leave</th>
+                    <th>Used Leave</th><!-- Update this with the ID of the cell for used leave -->
+                    <th>Pending Leave</th>
+                </tr>
+                <tr>
+                    <td>12</td> 
+                    <td id="usedLeave">Used Leave</td>
+                    <td id="pendingLeave"><!-- Pending Leave --></td>
+                </tr>
+            </table>
+        </div>
+        <button class="btn" onclick="showLeaveForm()">Apply Leave</button>
+        <button type="button" class="btn btn-sheet" onclick="showLeaveTable()">Leave Data</button>
+        <table id="leaveTable" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Reason</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                </tr>
+            </thead>
+            <tbody id="leaveTableBody"></tbody>
+        </table>
+        <div class="leave-form" id="leaveForm" style="display: none;">
+            <h3>Leave Form</h3>
+            <form id="leaveRequestForm">
+                <div class="input-container" style="display: none;">
+                    <label for="totalLeave">Total leave:</label>
+                    <input type="text" id="totalLeave" name="totalLeave" value="12" readonly>
+                </div>                              
+                <div class="input-container">
+                    <label for="employeeName">Employee Name:</label>
+                    <input type="text" id="employeeName" name="employeeName" required>
+                </div>
+                <div class="input-container-row">
+                    <div class="input-container">
+                        <label for="startDate">Start Date:</label>
+                        <input type="date" id="startDate" name="startDate" required>
+                    </div>
+                    <div class="input-container">
+                        <label for="endDate">End Date:</label>
+                        <input type="date" id="endDate" name="endDate" required>
+                    </div>
+                </div>
+                <div class="input-container">
+                    <label for="reason">Reason:</label>
+                    <textarea id="reason" name="reason" maxlength="160" required></textarea>
+                </div>
+                <button type="submit" class="btn">Submit</button>
+                <button type="button" class="btn btn-cancel" onclick="hideLeaveForm()">Cancel</button>
+            </form>
+        </div>
+        <div id="alert" class="alert" style="text-align: center;"></div>
+    </div>
+
+    <script>
+        function showLeaveForm() {
+            document.getElementById("leaveForm").style.display = "block";
+        }
+        function hideLeaveForm() {
+            document.getElementById("leaveForm").style.display = "none";
+        }
+
+        document.getElementById('leaveRequestForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch('http://192.168.0.121:3000/submitLeave', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(formData).toString()
+            })
+            .then(response => response.text())
+            .then(data => {
+                showAlert(data, 'success');
+                this.reset();
+                updateLeaveDetails(); // Fetch and update leave details after submission
+            })
+            .catch(error => {
+                showAlert('Error submitting leave', 'error');
+            });
+        });
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alert');
+            alertBox.textContent = message;
+            alertBox.className = 'alert alert-' + type;
+            alertBox.style.display = 'block';
+        }
+
+        function showLeaveTable() {
+            const leaveForm = document.getElementById('leaveForm');
+            const leaveTable = document.getElementById('leaveTable');
+
+            leaveForm.style.display = 'none'; // Hide the leave form
+            leaveTable.style.display = 'block'; // Show the leave table
+
+            const employeeName = localStorage.getItem('username');
+            fetch(`http://192.168.0.121:3000/fetchLeaveRequests/${employeeName}`)
+                .then(response => response.json())
+                .then(data => {
+                    populateLeaveTable(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching leave requests:', error);
+                });
+        }
+
+        function populateLeaveTable(data) {
+    const leaveTableBody = document.getElementById('leaveTableBody');
+    leaveTableBody.innerHTML = ''; // Clear previous data
+    
+    data.forEach(request => {
+        const startDate = new Date(request.startDate);
+        const endDate = new Date(request.endDate);
+        const month = startDate.toLocaleString('default', { month: 'long' });
+
+        const startDateFormatted = startDate.toLocaleDateString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: '2-digit'
+        });
+
+        const endDateFormatted = endDate.toLocaleDateString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: '2-digit'
+        });
+
+        const row = `<tr>
+                        <td>${month}</td>
+                        <td>${request.reason}</td>
+                        <td>${startDateFormatted}</td>
+                        <td>${endDateFormatted}</td>
+                    </tr>`;
+        leaveTableBody.insertAdjacentHTML('beforeend', row);
+    });
+}
+
+        function showLeaveForm() {
+            const leaveForm = document.getElementById('leaveForm');
+            const leaveTable = document.getElementById('leaveTable');
+
+            leaveTable.style.display = 'none'; // Hide the leave table
+            leaveForm.style.display = 'block'; // Show the leave form
+        }
+
+        // Fetch updated leave details and update the table cells
+        function updateLeaveDetails() {
+            const employeeName = localStorage.getItem('username');
+            fetch(`http://192.168.0.121:3000/leaveRequests/${employeeName}`)
+                .then(response => response.json())
+                .then(data => {
+                    updateUsedLeaveTable(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching leave requests:', error);
+                });
+        }
+
+        function updateUsedLeaveTable(leaveRequests) {
+            const usedLeaveCell = document.getElementById('usedLeave'); // Cell for used leave
+            let totalUsedLeave = 0; // Variable to store total days of leave used
+            let html = '';
+
+            leaveRequests.forEach(request => {
+                // Calculate total leave days, excluding the end date
+                const startDate = new Date(request.startDate);
+                const endDate = new Date(request.endDate);
+                const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)); // Excluding the end date
+                
+                totalUsedLeave += totalDays; // Add total days of current leave request to totalUsedLeave
+            });
+
+            // Append total days to HTML
+            html = `Total Used Leave: ${totalUsedLeave}`;
+
+            usedLeaveCell.innerHTML = html;
+
+            // Calculate pending leave
+            const totalLeave = 12; // Total leave available
+            const pendingLeave = totalLeave - totalUsedLeave;
+            
+            // Update the Pending Leave table cell with the calculated value
+            document.getElementById('pendingLeave').innerText = pendingLeave;
+        }
+        
+        // Function to handle login
+        function handleLogin(formData) {
+            // Your existing login logic here
+            
+            // Store username in local storage if login is successful
+            localStorage.setItem('username', formData.username);
+
+            // Display welcome message
+            displayWelcomeMessage(formData.username);
+        }
+
+        // Function to display the welcome message
+        function displayWelcomeMessage(username) {
+            document.getElementById("userSection").style.display = "block";
+            document.getElementById("welcomeMessage").innerText = "Welcome, " + username + "!";
+        }
+
+        window.onload = function() {
+            const username = localStorage.getItem('username');
+            if (username) {
+                displayWelcomeMessage(username);
+                fetchLeaveRequests(username); // Fetch leave requests for this user
+            }
+        };
+
+        function fetchLeaveRequests(employeeName) {
+            fetch(`http://192.168.0.121:3000/leaveRequests/${employeeName}`)
+                .then(response => response.json())
+                .then(data => {
+                    updateUsedLeaveTable(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching leave requests:', error);
+                });
+        }
+        function formatDate(date) {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    }
+
+    function displayCurrentDate() {
+        const currentDateElement = document.getElementById('currentDate');
+        const currentDate = new Date();
+        const formattedDate = formatDate(currentDate);
+        currentDateElement.innerText = `Date: ${formattedDate}`;
+    }
+
+    window.onload = function() {
+        displayCurrentDate();
+        const username = localStorage.getItem('username');
+        if (username) {
+            displayWelcomeMessage(username);
+            fetchLeaveRequests(username); // Fetch leave requests for this user
+        }
+    };
+    </script>
+</body>
+</html>

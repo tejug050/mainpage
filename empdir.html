@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employees List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .background-container {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            width: 80%;
+            max-width: 1200px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-container {
+            text-align: center;
+            margin: 20px;
+        }
+
+        .form-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .edit-input {
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search-container input {
+            width: 50%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-container">
+        <h1>Employees List</h1>
+<!--        <div class="form-container">
+            <button onclick="addEmployeeRow()">Add Employee</button>
+        </div>-->
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search by name..." onkeyup="searchEmployees()">
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Serial No</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Contact</th>
+                </tr>
+            </thead>
+            <tbody id="employee-list">
+                <!-- Employees will be loaded here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function loadEmployees() {
+            try {
+                const response = await fetch('http://192.168.0.121:3000/api/employees');
+                const employees = await response.json();
+                
+                const employeeList = document.getElementById('employee-list');
+                employeeList.innerHTML = '';
+
+                employees.forEach((employee, index) => {
+                    const row = `<tr>
+                        <td>${index + 1}</td>
+                        <td>${employee.name}</td>
+                        <td>${employee.department}</td>
+                        <td>${employee.contact}</td>
+                    </tr>`;
+                    employeeList.innerHTML += row;
+                });
+            } catch (error) {
+                console.error('Error loading employees:', error.message);
+            }
+        }
+
+        // Add a new employee row
+        function addEmployeeRow() {
+            const table = document.getElementById('employee-list');
+            const rowCount = table.rows.length;
+            const row = table.insertRow(rowCount);
+
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            const cell3 = row.insertCell(2);
+            const cell4 = row.insertCell(3);
+            const cell5 = row.insertCell(4);
+
+            cell1.innerHTML = rowCount + 1;
+            cell2.innerHTML = `<input type="text" class="edit-input" id="newEmployeeName${rowCount + 1}" placeholder="Name">`;
+            cell3.innerHTML = `<input type="text" class="edit-input" id="newDepartment${rowCount + 1}" placeholder="Department">`;
+            cell4.innerHTML = `<input type="text" class="edit-input" id="newContact${rowCount + 1}" placeholder="Contact">`;
+        }
+
+        // Search employees
+        function searchEmployees() {
+            const input = document.getElementById('searchInput').value.toUpperCase();
+            const table = document.getElementById('employee-list');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const tdName = rows[i].getElementsByTagName('td')[1];
+                const tdDepartment = rows[i].getElementsByTagName('td')[2];
+                const tdContact = rows[i].getElementsByTagName('td')[3];
+
+                if (tdName || tdDepartment || tdContact) {
+                    const txtValueName = tdName.textContent || tdName.innerText;
+                    const txtValueDepartment = tdDepartment.textContent || tdDepartment.innerText;
+                    const txtValueContact = tdContact.textContent || tdContact.innerText;
+
+                    if (txtValueName.toUpperCase().indexOf(input) > -1 ||
+                        txtValueDepartment.toUpperCase().indexOf(input) > -1 ||
+                        txtValueContact.toUpperCase().indexOf(input) > -1) {
+                        rows[i].style.display = '';
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        // Load employees on page load
+        loadEmployees();
+    </script>
+</body>
+</html>

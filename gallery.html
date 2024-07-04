@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery</title>
+       <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        .gallery-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .gallery-heading {
+            text-align: center;
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .gallery-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .gallery-image {
+            width:110px;
+            height: 90px; /* Adjusted height */
+            object-fit: cover; /* Ensure images maintain aspect ratio */
+            cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .gallery-image:hover {
+            transform: scale(1.1); /* Image zoom on hover */
+        }
+
+        .large-photo-container {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+        }
+
+        .large-photo {
+            max-width: 70%;
+            max-height: 70%;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            color: #fff;
+            cursor: pointer;
+            background: red;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 50%;
+        }
+
+        .arrow-btn {
+            font-size: 24px;
+            color: #fff;
+            cursor: pointer;
+            background: none;
+            border: none;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 10px;
+            z-index: 1001;
+        }
+
+        #prevBtn {
+            left: 20px;
+        }
+
+        #nextBtn {
+            right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="gallery" class="gallery-container">
+        <h2 class="gallery-heading">Gallery</h2>
+        <div class="gallery-row">
+            <img src="photo13.jpg" alt="Image 1" class="gallery-image" onclick="showLargePhoto('photo1-large.jpg')">
+            <img src="photo2.jpg" alt="Image 2" class="gallery-image" onclick="showLargePhoto('photo2-large.jpg')">
+            <img src="photo4.jpg" alt="Image 4" class="gallery-image" onclick="showLargePhoto('photo3-large.jpg')">
+            <img src="photo5.jpg" alt="Image 5" class="gallery-image" onclick="showLargePhoto('photo4-large.jpg')">
+            <img src="photo6.jpg" alt="Image 6" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+            <img src="photo7.jpg" alt="Image 7" class="gallery-image" onclick="showLargePhoto('image6-large.jpg')">
+            <img src="photo1.jpg" alt="Image 8" class="gallery-image" onclick="showLargePhoto('photo4-large.jpg')">
+            <img src="photo9.jpg" alt="Image 9" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+            <img src="photo10.jpg" alt="Image 10" class="gallery-image" onclick="showLargePhoto('image6-large.jpg')">
+        </div>
+        <div class="gallery-row">
+            <img src="photo11.jpg" alt="Image 11" class="gallery-image" onclick="showLargePhoto('photo4-large.jpg')">
+            <img src="photo12.jpg" alt="Image 12" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+            <img src="photo8.jpg" alt="Image 8" class="gallery-image" onclick="showLargePhoto('image6-large.jpg')">
+            <img src="photo23.jpg" alt="Image 13" class="gallery-image" onclick="showLargePhoto('photo4-large.jpg')">
+            <img src="photo14.jpg" alt="Image 14" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+            <img src="photo15.jpg" alt="Image 15" class="gallery-image" onclick="showLargePhoto('image6-large.jpg')">
+            <img src="photo16.jpg" alt="Image 16" class="gallery-image" onclick="showLargePhoto('photo4-large.jpg')">
+            <img src="photo17.jpg" alt="Image 17" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+            <img src="photo18.jpg" alt="Image 18" class="gallery-image" onclick="showLargePhoto('image6-large.jpg')">
+        </div>
+        <div class="gallery-row">
+            <img src="photo19.jpg" alt="Image 19" class="gallery-image" onclick="showLargePhoto('photo4-large.jpg')">
+            <img src="photo20.jpg" alt="Image 20" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+            <img src="photo21.jpg" alt="Image 21" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+            <img src="photo22.jpg" alt="Image 22" class="gallery-image" onclick="showLargePhoto('image6-large.jpg')">
+            <img src="photo27.jpg" alt="Image 23" class="gallery-image" onclick="showLargePhoto('photo4-large.jpg')">
+            <img src="photo24.jpg" alt="Image 24" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+            <img src="photo28.jpg" alt="Image 25" class="gallery-image" onclick="showLargePhoto('image5-large.jpg')">
+            <img src="photo29.jpg" alt="Image 26" class="gallery-image" onclick="showLargePhoto('image6-large.jpg')">
+            <img src="photo26.jpg" alt="Image 28" class="gallery-image" onclick="showLargePhoto('photo4-large.jpg')">
+        </div>
+    </div>
+
+    <div class="large-photo-container" id="largePhotoContainer">
+        <img src="" alt="Enlarged Image" class="large-photo" id="enlargedImage">
+        <button onclick="prevImage()" id="prevBtn" class="arrow-btn">&#9664;</button> <!-- Left arrow symbol -->
+        <button onclick="nextImage()" id="nextBtn" class="arrow-btn">&#9654;</button> <!-- Right arrow symbol -->
+        <button onclick="closeImage()" id="closeBtn" class="close-btn">&times;</button> <!-- Close button (X mark) -->
+    </div>
+
+    <script>
+        var currentImageIndex = 0;
+        var images = [];
+        var largePhotoContainer = document.getElementById("largePhotoContainer");
+        var enlargedImage = document.getElementById("enlargedImage");
+        var prevBtn = document.getElementById("prevBtn");
+        var nextBtn = document.getElementById("nextBtn");
+
+        // Function to show enlarged photo
+        function showLargePhoto(imageSrc) {
+            enlargedImage.src = imageSrc;
+            largePhotoContainer.style.display = "flex";
+            currentImageIndex = images.findIndex(img => img === imageSrc);
+        }
+
+        // Function to handle previous image
+        function prevImage() {
+            currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+            enlargedImage.src = images[currentImageIndex];
+        }
+
+        // Function to handle next image
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % images.length;
+            enlargedImage.src = images[currentImageIndex];
+        }
+
+        // Function to close the enlarged image
+        function closeImage() {
+            largePhotoContainer.style.display = "none";
+        }
+
+        // Attach click event listeners to all gallery images
+        var galleryImages = document.querySelectorAll(".gallery-image");
+        galleryImages.forEach(function(img) {
+            img.addEventListener("click", function() {
+                enlargedImage.src = img.src; // Set the source of the enlarged image to the clicked image
+                largePhotoContainer.style.display = "flex"; // Show the large photo container
+                currentImageIndex = Array.from(galleryImages).indexOf(img); // Set the current image index
+            });
+            images.push(img.src); // Push the image source to the images array
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback Form</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f2f2f2;
+  }
+
+  .container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative; /* Add position relative */
+  }
+
+  h2 {
+    margin-top: 0;
+    text-align: center;
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  select, textarea, input[type="text"], input[type="date"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+    box-sizing: border-box; /* Ensure the input width includes padding */
+  }
+
+  textarea {
+    height: 150px; /* Adjust height for feedback textarea */
+  }
+
+  button {
+    background-color: #0056b3;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Feedback Form</h2>
+  <form id="feedbackForm" action="http://192.168.0.121:3000/submit_feedback" method="post">
+    <label for="date">Date:</label>
+    <input type="date" id="date" required><br>
+    <label for="category">Category:</label>
+    <select id="category" required onchange="toggleOtherCategory(this.value)">
+      <option value="">Select a category</option>
+      <option value="QA">QA</option>
+      <option value="Development">Development</option>
+      <option value="Admin">Admin</option>
+      <option value="Other">Other</option>
+    </select>
+    <div id="otherCategoryInput" style="display: none;">
+      <label for="newCategory">New Category:</label>
+      <input type="text" id="newCategory">
+    </div><br>
+    <label for="feedback">Feedback:</label><br>
+    <textarea id="feedback" rows="4" cols="50" required></textarea><br>
+    <button type="submit">Submit</button>
+  </form>
+</div>
+<script>
+ function toggleOtherCategory(value) {
+    var otherCategoryInput = document.getElementById("otherCategoryInput");
+    if (value === "Other") {
+      otherCategoryInput.style.display = "block";
+    } else {
+      otherCategoryInput.style.display = "none";
+    }
+  }
+
+  document.getElementById("feedbackForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+    var category = document.getElementById("category").value;
+    var feedback = document.getElementById("feedback").value;
+    var date = document.getElementById("date").value;
+
+    if (category === "Other") {
+      category = document.getElementById("newCategory").value;
+    }
+
+    // Prepare the data to send
+    var formData = {
+      date: date,
+      category: category,
+      feedback: feedback
+    };
+
+    // Send the data to the server
+    fetch('http://192.168.0.121:3000/submit_feedback', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(response => {
+      if (response.ok) {
+        alert("Feedback submitted successfully!");
+        document.getElementById("feedbackForm").reset();
+      } else {
+        throw new Error('Network response was not ok');
+      }
+    })
+    .catch(error => {
+      console.error('Error submitting feedback:', error);
+      alert("Error submitting feedback. Please try again later.");
+    });
+  });
+</script>
+
+</body>
+</html>

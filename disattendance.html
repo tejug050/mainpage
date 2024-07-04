@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 20px auto;
+            max-width: 800px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto; /* Enable vertical scroll */
+            max-height: 600px; /* Maximum height before scroll appears */
+        }
+        h2, h3 {
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="text"], input[type="password"], select, input[type="date"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        input[type="submit"] {
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        input[type="submit"]:hover {
+            background-color: #218838;
+        }
+        .hidden {
+            display: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        tbody tr:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
+        .fetch-button {
+            margin-top: 10px;
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        .fetch-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="container">
+        <h2>Attendance Details</h2>
+        <div class="user-select-container">
+            <label for="userSelect">Select User:</label>
+            <select id="userSelect">
+                <option value="" disabled selected>Select a user</option>
+            </select>
+        </div>
+
+        <div id="userDetails" class="hidden">
+            <!-- Fetch by Date Form -->
+            <h2>Fetch Attendance Data</h2>
+<div id="fetchByDateForm">
+    <label for="attendanceDate">Select Date: </label>
+    <input type="date" id="attendanceDate">
+    <button type="button" id="fetchDataBtn">Fetch Attendance Data</button>
+</div>
+            <h3>User Details</h3>
+           <table id="attendanceTable" class="hidden">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Day</th>
+            <th>Login Time</th>
+            <th>Logout Time</th>
+            <th>Worked Hours</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+    <tbody id="attendanceTableBody">
+        <!-- Attendance records will be appended here -->
+    </tbody>
+</table>
+
+        </div>
+    </div>
+
+    <script>
+        async function fetchUsernames() {
+            try {
+                const response = await fetch('http://192.168.0.121:3000/usernames');
+                if (!response.ok) {
+                    throw new Error('Error fetching usernames.');
+                }
+                const usernames = await response.json();
+                const userSelect = document.getElementById('userSelect');
+                usernames.forEach(username => {
+                    const option = document.createElement('option');
+                    option.value = username;
+                    option.textContent = username;
+                    userSelect.appendChild(option);
+                });
+
+                // Add event listener for username selection
+                userSelect.addEventListener('change', fetchUserDetails);
+            } catch (error) {
+                console.error('Error fetching usernames:', error);
+                alert('Error fetching usernames.');
+            }
+        }
+
+        async function fetchUserDetails() {
+            const username = document.getElementById('userSelect').value;
+            try {
+                const response = await fetch(`http://192.168.0.121:3000/user-attendance?username=${username}`);
+                if (!response.ok) {
+                    throw new Error('Error fetching attendance records.');
+                }
+                const records = await response.json();
+                const tbody = document.getElementById('attendanceTableBody');
+                tbody.innerHTML = ''; // Clear previous records
+
+                if (records.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6">No attendance records found.</td></tr>';
+                } else {
+                    records.forEach(record => {
+                        // Convert the date to a readable format
+                        const date = new Date(record.date).toLocaleDateString('en-GB');
+                        const dayOfWeek = new Date(record.date).toLocaleDateString('en-US', { weekday: 'long' });
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${date}</td>
+                            <td>${dayOfWeek}</td>
+                            <td>${record.login_time}</td>
+                            <td>${record.logout_time}</td>
+                            <td>${record.worked_hours}</td>
+                            <td>${record.reason}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+
+                // Show user details section
+                document.getElementById('userDetails').classList.remove('hidden');
+                // Show fetch by date form
+                document.getElementById('fetchByDateForm').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error fetching attendance records:', error);
+                alert('Error fetching attendance records.');
+            }
+        }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const fetchDataBtn = document.getElementById('fetchDataBtn');
+    const attendanceTable = document.getElementById('attendanceTable');
+
+    // Function to fetch and display all attendance records initially
+    async function fetchAllAttendance(username) {
+        try {
+            const response = await fetch(`http://192.168.0.121:3000/user-attendance?username=${username}`);
+            if (!response.ok) {
+                throw new Error('Error fetching attendance records.');
+            }
+            const records = await response.json();
+            displayAttendance(records);
+        } catch (error) {
+            console.error('Error fetching attendance records:', error);
+            alert('Error fetching attendance records.');
+        }
+    }
+ // Function to fetch attendance records by selected date
+    async function fetchAttendanceByDate(username, date) {
+        try {
+            // Convert date to YYYY-MM-DD format for URL
+            const formattedDate = formatDate(date);
+
+            const url = `http://192.168.0.121:3000/user-attendance?username=${username}&date=${formattedDate}`;
+            console.log('Fetching attendance records from URL:', url);
+
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('Error fetching attendance records for date.');
+            }
+            const records = await response.json();
+
+            if (records.length === 0) {
+                // If no records found, display message and hide table
+                const tbody = document.getElementById('attendanceTableBody');
+                tbody.innerHTML = '<tr><td colspan="6">No attendance records found for this date.</td></tr>';
+                attendanceTable.classList.add('hidden'); // Hide table
+            } else {
+                // If records found, display them in the table
+                displayAttendance(records);
+                attendanceTable.classList.remove('hidden'); // Show table
+            }
+        } catch (error) {
+            console.error('Error fetching attendance records for date:', error);
+            alert('Error fetching attendance records for date.');
+        }
+    }
+
+    // Event listener for Fetch Attendance Data button
+    fetchDataBtn.addEventListener('click', async () => {
+        const username = userSelect.value;
+        const attendanceDate = document.getElementById('attendanceDate').value;
+
+        if (!username || !attendanceDate) {
+            alert('Please select a user and a date.');
+            return;
+        }
+
+        // Fetch attendance records by date
+        await fetchAttendanceByDate(username, attendanceDate);
+    });
+// Function to format date to YYYY-MM-DD
+function formatDate(dateString) {
+    const [year, month, day] = dateString.split('-'); // Split by '-' assuming input format is YYYY-MM-DD
+    return `${day}/${month}/${year}`;
+}
+
+// Function to display attendance records in the table
+function displayAttendance(records) {
+    const tbody = document.getElementById('attendanceTableBody');
+    tbody.innerHTML = ''; // Clear previous records
+
+    if (records.length === 0) {
+        // If no records found, display message and hide table
+        tbody.innerHTML = '<tr><td colspan="6">No attendance records found.</td></tr>';
+        attendanceTable.classList.add('hidden'); // Hide table
+    } else {
+        // If records found, display them in the table
+        records.forEach(record => {
+            const date = new Date(record.date).toLocaleDateString('en-GB');
+            const dayOfWeek = new Date(record.date).toLocaleDateString('en-US', { weekday: 'long' });
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${date}</td>
+                <td>${dayOfWeek}</td>
+                <td>${record.login_time}</td>
+                <td>${record.logout_time}</td>
+                <td>${record.worked_hours}</td>
+                <td>${record.reason}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Show table after fetching data
+        attendanceTable.classList.remove('hidden');
+    }
+}
+function formatDate(dateString) {
+    return dateString; // Assuming input is already in YYYY-MM-DD format from the HTML input
+}
+
+    // Initial fetch of all attendance records for the selected user
+    const userSelect = document.getElementById('userSelect');
+    userSelect.addEventListener('change', async () => {
+        const username = userSelect.value;
+        if (username) {
+            await fetchAllAttendance(username);
+        }
+    });
+
+
+    // Call fetchUsernames when the page loads
+    fetchUsernames(); // Assuming fetchUsernames is defined elsewhere in your script
+});
+
+        // Call fetchUsernames when the page loads
+        document.addEventListener('DOMContentLoaded', fetchUsernames);
+    </script>
+</body>
+</html>
