@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letter to My Love</title>
+    <style>
+        body {
+            background-color: #f2f2f2;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+
+        .heart-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50vh;
+        }
+
+        .heart {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            cursor: pointer;
+            background-color: red;
+            transform: rotate(-45deg);
+            margin-top: 50px;
+        }
+
+        .heart::before,
+        .heart::after {
+            content: "";
+            width: 150px;
+            height: 150px;
+            position: absolute;
+            background-color: red;
+            border-radius: 50%;
+        }
+
+        .heart::before {
+            top: -75px;
+            left: 0;
+        }
+
+        .heart::after {
+            top: 0;
+            left: 75px;
+        }
+
+        .letter-container {
+            display: none;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            max-width: 600px;
+            margin: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .letter h1 {
+            color: #e91e63;
+            font-family: 'Cursive', sans-serif;
+            text-align: center;
+        }
+
+        .letter p {
+            color: #333;
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+
+        .letter p:last-child {
+            text-align: right;
+            margin-top: 30px;
+        }
+
+        .letter p:first-of-type::first-letter {
+            font-size: 2em;
+            font-weight: bold;
+            color: #e91e63;
+        }
+
+        .welcome {
+            display: none;
+            font-size: 2em;
+            color: #e91e63;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="heart-container">
+        <div class="heart" onclick="showLetter()"></div>
+    </div>
+    <div class="welcome" id="welcomeMessage">Welcome to my heart</div>
+    <div class="letter-container" id="letter">
+        <div class="letter">
+            <h1>To My Dearest [Pathi],</h1>
+            <p>
+                I hope this letter finds you in the best of health and spirits. 
+                Words cannot express how much you mean to me, but I will try my best to convey my feelings through this letter.
+            </p>
+            <p>
+                From the moment we met, you have brought endless joy and love into my life. 
+                Your smile lights up my world, and your kindness and warmth make every day better.
+            </p>
+            <p>
+                I am forever grateful to have you by my side, sharing in life's ups and downs. 
+                You are my rock, my confidant, and my best friend. I cherish every moment we spend together and look forward to many more.
+            </p>
+            <p>
+                Nowadays, you are not spending as much time with me, and I feel like I'm being ignored. 
+                I don't know why I am feeling like this, but I wanted to share it with you because you mean so much to me.
+            </p>
+            <p>
+                Thank you for being you, and for loving me the way you do. 
+                I love you more than words can say.
+            </p>
+            <p>
+                This may not be the right time, but I need to share my feelings because no matter how hard I try, my expectations hurt me. 
+                Finally, I've decided to move on from you, but you'll always be my first love. Thank you for the wonderful memories.
+            </p>
+            <p>
+                With all my love,<br>
+                [Pathni]
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function showLetter() {
+            const heart = document.querySelector('.heart');
+            const welcomeMessage = document.getElementById('welcomeMessage');
+            const letter = document.getElementById('letter');
+            heart.style.animation = 'explode 0.5s forwards';
+            setTimeout(() => {
+                heart.style.display = 'none';
+                welcomeMessage.style.display = 'block';
+                setTimeout(() => {
+                    welcomeMessage.style.display = 'none';
+                    letter.style.display = 'block';
+                }, 2000);
+            }, 500);
+        }
+    </script>
+</body>
+</html>
